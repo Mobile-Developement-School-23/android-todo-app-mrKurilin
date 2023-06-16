@@ -30,7 +30,7 @@ class ToDoItemsAdapter(
         )!!
         val unDoneIcon = ContextCompat.getDrawable(
             context,
-            R.drawable.baseline_cancel_24,
+            R.drawable.baseline_crop_square_24,
         )!!
         val toDoItemSwipeGesture = object : ToDoItemSwipeGesture(deleteIcon, doneIcon, unDoneIcon) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

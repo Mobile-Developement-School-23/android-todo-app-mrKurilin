@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentToDoListBinding
 import com.example.todoapp.presentation.to_do_list.model.ToDoListItemUIModel
@@ -69,6 +70,10 @@ class ToDoListFragment : Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
+        val itemAnimator = binding.recyclerView.itemAnimator
+        if (itemAnimator is SimpleItemAnimator) {
+            itemAnimator.supportsChangeAnimations = false
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             launch {

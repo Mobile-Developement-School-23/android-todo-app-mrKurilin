@@ -114,6 +114,6 @@ abstract class ToDoItemSwipeGesture(
     }
 
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
-        return defaultValue * 5 //10 -> almost insensitive
+        return defaultValue * 5
     }
 }

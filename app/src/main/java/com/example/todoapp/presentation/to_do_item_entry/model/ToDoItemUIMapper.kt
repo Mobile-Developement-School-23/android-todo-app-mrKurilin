@@ -1,9 +1,9 @@
-package com.example.todoapp.presentation.to_do_list.model
+package com.example.todoapp.presentation.to_do_item_entry.model
 
 import com.example.todoapp.R
 import com.example.todoapp.domain.model.ToDoItem
 import com.example.todoapp.domain.model.ToDoItemPriority
-import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIModel
+import java.util.Date
 
 class ToDoItemUIMapper {
 
@@ -26,6 +26,43 @@ class ToDoItemUIMapper {
             text = todoItem.text,
             priorityStringId = priorityStringId,
             deadLineDate = todoItem.deadLineDate?.time
+        )
+    }
+
+    fun toToDoItem(
+        toDoItemUIModel: ToDoItemUIModel,
+    ): ToDoItem {
+        val priority = when (toDoItemUIModel.priorityStringId) {
+            R.string.no -> {
+                ToDoItemPriority.NORMAL
+            }
+
+            R.string.high -> {
+                ToDoItemPriority.HIGH
+            }
+
+            R.string.low -> {
+                ToDoItemPriority.LOW
+            }
+
+            else -> {
+                throw IllegalStateException()
+            }
+        }
+        val creationDate = Date()
+        val deadLineDate = if (toDoItemUIModel.deadLineDate == null) {
+            null
+        } else {
+            Date(toDoItemUIModel.deadLineDate)
+        }
+        return ToDoItem(
+            id = creationDate.time.toString(),
+            text = toDoItemUIModel.text,
+            priority = priority,
+            creationDate = creationDate,
+            isDone = false,
+            deadLineDate = deadLineDate,
+            editDate = null,
         )
     }
 }

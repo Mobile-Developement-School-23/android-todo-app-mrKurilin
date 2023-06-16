@@ -2,15 +2,14 @@ package com.example.todoapp.presentation.to_do_item_entry
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.example.todoapp.R
 import com.example.todoapp.ToDoApp
 import com.example.todoapp.domain.model.ToDoItem
 import com.example.todoapp.domain.model.ToDoItemPriority
+import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -19,70 +18,90 @@ class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
     private val todoItemsRepository = toDoApp.provideTodoItemsRepository()
     private val toDoItemUIMapper = toDoApp.provideToDoItemUIMapper()
 
-    private val _uiState = MutableStateFlow(ToDoEntryUIState())
-    val uiStateFlow: StateFlow<ToDoEntryUIState> = _uiState
+    private val _currentToDoItemUIModel = MutableStateFlow(
+        ToDoItemUIModel(
+            text = "",
+            priorityStringId = R.string.no,
+            deadLineDate = null,
+        )
+    )
+    val uiStateFlow: StateFlow<ToDoItemUIModel> = _currentToDoItemUIModel
 
-    private val _selectedDateLongFlow = MutableStateFlow(Date().time)
-    val selectedDateStringFlow = _selectedDateLongFlow.map { dateLong ->
-        SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(Date(dateLong))
-    }
-
-    private var loadedToDoItem: ToDoItem? = null
-
-    fun onSavePressed(
-        text: String,
-        priority: ToDoItemPriority,
-        deadLineDate: Date?,
-    ) {
-        val loadedToDoItem = loadedToDoItem
-        val currentDate = Date()
-        if (loadedToDoItem == null) {
-            val toDoItem = ToDoItem(
-                id = currentDate.time.toString(),
-                text = text,
-                priority = priority,
-                creationDate = currentDate,
-                isDone = false,
-                deadLineDate = deadLineDate,
+    fun onSavePressed(toDoItemId: String?) {
+        val toDoItemUIModel = _currentToDoItemUIModel.value
+        if (toDoItemId == null) {
+            todoItemsRepository.addToDoItem(
+                toDoItemUIMapper.toToDoItem(toDoItemUIModel)
             )
-            todoItemsRepository.addToDoItem(toDoItem)
         } else {
-            val toDoItem = loadedToDoItem.copy(
-                text = text,
+            val priority = when (toDoItemUIModel.priorityStringId) {
+                R.string.no -> {
+                    ToDoItemPriority.NORMAL
+                }
+
+                R.string.high -> {
+                    ToDoItemPriority.HIGH
+                }
+
+                R.string.low -> {
+                    ToDoItemPriority.LOW
+                }
+
+                else -> {
+                    throw IllegalStateException()
+                }
+            }
+
+            todoItemsRepository.updateToDoItem(
+                toDoItemId = toDoItemId,
+                text = toDoItemUIModel.text,
+                deadLineDate = toDoItemUIModel.deadLineDate,
                 priority = priority,
-                deadLineDate = deadLineDate,
-                editDate = currentDate
             )
-            todoItemsRepository.updateToDoItem(toDoItem)
         }
     }
 
     fun loadToDoItem(toDoItemId: String?) {
         if (toDoItemId != null) {
             val toDoItem: ToDoItem = todoItemsRepository.getToDoItem(toDoItemId)
-            loadedToDoItem = toDoItem
             val toDoItemUIModel = toDoItemUIMapper.toToDoItemUIModel(toDoItem)
-            _uiState.value = _uiState.value.copy(
-                ableToSave = true,
-                enabledDeadLine = toDoItemUIModel.deadLineDate != null,
-                toDoItemUIModel = toDoItemUIModel,
-            )
+            _currentToDoItemUIModel.value = toDoItemUIModel
         }
     }
 
-    fun deleteToDoItem() {
-        val loadedToDoItem = this.loadedToDoItem
-        if (loadedToDoItem != null) {
-            todoItemsRepository.deleteToDoItem(loadedToDoItem.id)
+    fun deleteToDoItem(toDoItemId: String?) {
+        if (toDoItemId != null) {
+            todoItemsRepository.deleteToDoItem(toDoItemId)
         }
     }
 
-    fun onSwitchPressed() {
-        val isEnabledDeadline = _uiState.value.enabledDeadLine
-        _uiState.value = _uiState.value.copy(enabledDeadLine = !isEnabledDeadline)
+    fun onDeadLineSwitchPressed() {
+        val currentToDoItemUIModel = _currentToDoItemUIModel.value
+        val deadLineDate = if (currentToDoItemUIModel.deadLineDate == null) {
+            Date().time
+        } else {
+            null
+        }
+        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
+            deadLineDate = deadLineDate
+        )
     }
 
-    fun onSelectedDateChanged(dateLong: Long) {
-        _selectedDateLongFlow.value = dateLong
+    fun onDeadLineDateChanged(dateLong: Long) {
+        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
+            deadLineDate = dateLong
+        )
+    }
+
+    fun textChanged(text: String) {
+        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
+            text = text
+        )
+    }
+
+    fun onSpinnerItemSelectedListener(priorityStringId: Int) {
+        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
+            priorityStringId = priorityStringId
+        )
     }
 }

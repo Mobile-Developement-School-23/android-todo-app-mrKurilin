@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import com.example.todoapp.data.TodoItemsRepository
 import com.example.todoapp.data.local.ToDoItemLocalMapper
 import com.example.todoapp.data.local.ToDoItemsLocalDataSource
-import com.example.todoapp.presentation.to_do_list.model.ToDoItemUIMapper
+import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIMapper
 
 class ToDoApp : Application() {
 

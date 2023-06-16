@@ -69,7 +69,7 @@ class ToDoItemsLocalDataSource(
         updateLocalList(list)
     }
 
-    fun getToDoItem(toDoItemId: String): ToDoItemLocal {
+    fun getToDoItemLocal(toDoItemId: String): ToDoItemLocal {
         return toDoListMutableStateFlow.value.first { it.id == toDoItemId }
     }
 

@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -12,10 +14,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentEntryToDoItemBinding
-import com.example.todoapp.domain.model.ToDoItemPriority
+import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
@@ -24,6 +28,8 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
     private var _binding: FragmentEntryToDoItemBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var adapter: ArrayAdapter<CharSequence>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,102 +49,116 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
             findNavController().popBackStack()
         }
 
+        binding.textEditText.doAfterTextChanged { text ->
+            toDoEntryViewModel.textChanged(text.toString())
+        }
+
         binding.saveTextView.setOnClickListener {
-            val priority = when (binding.prioritySpinner.selectedItem.toString()) {
-                getString(R.string.high) -> {
-                    ToDoItemPriority.HIGH
-                }
-
-                getString(R.string.low) -> {
-                    ToDoItemPriority.LOW
-                }
-
-                getString(R.string.no) -> {
-                    ToDoItemPriority.NORMAL
-                }
-
-                else -> {
-                    throw IllegalStateException()
-                }
-            }
-
-            val deadLineDate = if (binding.deadlineSwitch.isChecked) {
-                Date(binding.datePickerCalendarView.date)
-            } else {
-                null
-            }
-
-            toDoEntryViewModel.onSavePressed(
-                text = binding.textEditText.text.toString(),
-                priority = priority,
-                deadLineDate = deadLineDate,
-            )
-
+            toDoEntryViewModel.onSavePressed(args.toDoItemId)
             findNavController().popBackStack()
         }
 
         binding.deleteTextView.setOnClickListener {
-            toDoEntryViewModel.deleteToDoItem()
+            toDoEntryViewModel.deleteToDoItem(args.toDoItemId)
             findNavController().popBackStack()
         }
 
         binding.deadlineSwitch.setOnClickListener {
-            toDoEntryViewModel.onSwitchPressed()
+            toDoEntryViewModel.onDeadLineSwitchPressed()
         }
 
         binding.datePickerCalendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val date = Calendar.getInstance()
-            date.set(year, month, dayOfMonth)
-            toDoEntryViewModel.onSelectedDateChanged(date.timeInMillis)
+            toDoEntryViewModel.onDeadLineDateChanged(
+                Calendar.getInstance().also { it.set(year, month, dayOfMonth) }.timeInMillis
+            )
         }
 
-        binding.deleteTextView.isEnabled = false
+        resources.getStringArray(R.array.priorities)
 
-        lifecycleScope.launch {
-            launch {
-                toDoEntryViewModel.uiStateFlow.collect { toDoEntryUIState ->
-                    updateUI(toDoEntryUIState)
+        adapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.priorities,
+            android.R.layout.simple_spinner_dropdown_item
+        )
+        binding.prioritySpinner.adapter = adapter
+
+        binding.prioritySpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    toDoEntryViewModel.onSpinnerItemSelectedListener(getPriorityStringIdFromSpinner())
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    //do nothing
                 }
             }
 
+        binding.deleteTextView.isEnabled = args.toDoItemId != null
+
+        lifecycleScope.launch {
             launch {
-                toDoEntryViewModel.selectedDateStringFlow.collect { date ->
-                    binding.deadlineDateTextView.text = date
+                toDoEntryViewModel.uiStateFlow.collect { toDoItemUIModel ->
+                    updateUI(toDoItemUIModel)
                 }
             }
         }
     }
 
-    private fun updateUI(toDoEntryUIState: ToDoEntryUIState) {
-        binding.saveTextView.isEnabled = toDoEntryUIState.ableToSave
+    private fun updateUI(toDoItemUIModel: ToDoItemUIModel) {
 
-        binding.deadlineSwitch.isChecked = toDoEntryUIState.enabledDeadLine
+        binding.saveTextView.isEnabled = toDoItemUIModel.text.isNotEmpty()
 
-        if (toDoEntryUIState.enabledDeadLine) {
+        binding.deadlineSwitch.isChecked = toDoItemUIModel.deadLineDate != null
+
+        if (toDoItemUIModel.deadLineDate != null) {
             binding.deadlineGroup.visibility = View.VISIBLE
+            binding.deadlineTextView.text = SimpleDateFormat(
+                "dd MMMM yyyy",
+                Locale.getDefault()
+            ).format(Date(toDoItemUIModel.deadLineDate))
         } else {
             binding.deadlineGroup.visibility = View.GONE
         }
 
-        if (toDoEntryUIState.toDoItemUIModel != null) {
-            val toDoItemUIModel = toDoEntryUIState.toDoItemUIModel
-            binding.textEditText.setText(toDoItemUIModel.text)
-            if (toDoItemUIModel.deadLineDate != null) {
-                binding.datePickerCalendarView.date = toDoItemUIModel.deadLineDate
-            }
+        binding.textEditText.setText(toDoItemUIModel.text)
+        binding.textEditText.setSelection(toDoItemUIModel.text.length)
 
-            val position = (binding.prioritySpinner.adapter as ArrayAdapter<String>).getPosition(
-                getString(toDoItemUIModel.priorityStringId)
-            )
+        binding.datePickerCalendarView.date = toDoItemUIModel.deadLineDate ?: Date().time
 
-            binding.prioritySpinner.setSelection(position)
+        val position = adapter.getPosition(
+            getString(toDoItemUIModel.priorityStringId)
+        )
 
-            binding.deleteTextView.isEnabled = true
-        }
+        binding.prioritySpinner.setSelection(position)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun getPriorityStringIdFromSpinner(): Int {
+        return when (binding.prioritySpinner.selectedItem.toString()) {
+            getString(R.string.high) -> {
+                R.string.high
+            }
+
+            getString(R.string.low) -> {
+                R.string.low
+            }
+
+            getString(R.string.no) -> {
+                R.string.no
+            }
+
+            else -> {
+                throw IllegalStateException()
+            }
+        }
     }
 }
