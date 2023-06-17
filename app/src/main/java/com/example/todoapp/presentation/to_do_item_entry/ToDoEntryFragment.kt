@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -28,8 +27,6 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
     private var _binding: FragmentEntryToDoItemBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var adapter: ArrayAdapter<CharSequence>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,13 +71,6 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
         }
 
         resources.getStringArray(R.array.priorities)
-
-        adapter = ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.priorities,
-            android.R.layout.simple_spinner_dropdown_item
-        )
-        binding.prioritySpinner.adapter = adapter
 
         binding.prioritySpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -130,11 +120,21 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
         binding.datePickerCalendarView.date = toDoItemUIModel.deadLineDate ?: Date().time
 
-        val position = adapter.getPosition(
-            getString(toDoItemUIModel.priorityStringId)
-        )
+        binding.prioritySpinner.setSelection(when(toDoItemUIModel.priorityStringId){
+            R.string.no -> {
+                0
+            }
+            R.string.high -> {
+                2
+            }
+            R.string.low -> {
+                1
+            }
 
-        binding.prioritySpinner.setSelection(position)
+            else -> {
+                throw IllegalStateException()
+            }
+        })
     }
 
     override fun onDestroyView() {

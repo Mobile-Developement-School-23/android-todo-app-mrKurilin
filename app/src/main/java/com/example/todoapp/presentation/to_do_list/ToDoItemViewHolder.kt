@@ -13,7 +13,7 @@ import com.example.todoapp.domain.model.ToDoItemPriority
 import com.example.todoapp.presentation.to_do_list.model.ToDoListItemUIModel
 
 class ToDoItemViewHolder(
-    val binding: ToDoItemViewHolderBinding,
+    private val binding: ToDoItemViewHolderBinding,
     private val deleteToDoItem: (Int) -> Unit,
     private val editToDoItem: (Int) -> Unit,
     private val setDoneToDoItem: (Int) -> Unit,
