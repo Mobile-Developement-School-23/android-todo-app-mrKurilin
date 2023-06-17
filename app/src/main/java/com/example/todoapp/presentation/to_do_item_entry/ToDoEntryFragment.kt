@@ -70,8 +70,6 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
             )
         }
 
-        resources.getStringArray(R.array.priorities)
-
         binding.prioritySpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -107,7 +105,7 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
         if (toDoItemUIModel.deadLineDate != null) {
             binding.deadlineGroup.visibility = View.VISIBLE
-            binding.deadlineTextView.text = SimpleDateFormat(
+            binding.deadlineDateTextView.text = SimpleDateFormat(
                 "dd MMMM yyyy",
                 Locale.getDefault()
             ).format(Date(toDoItemUIModel.deadLineDate))

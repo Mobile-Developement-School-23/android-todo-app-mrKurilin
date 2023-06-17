@@ -2,7 +2,6 @@ package com.example.todoapp.presentation.to_do_item_entry
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.todoapp.R
 import com.example.todoapp.ToDoApp
 import com.example.todoapp.domain.model.ToDoItem
 import com.example.todoapp.domain.model.ToDoItemPriority
@@ -18,17 +17,17 @@ class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
     private val todoItemsRepository = toDoApp.provideTodoItemsRepository()
     private val toDoItemUIMapper = toDoApp.provideToDoItemUIMapper()
 
-    private val _currentToDoItemUIModel = MutableStateFlow(
+    private val _currentToDoItemUIModelMutableStateFlow = MutableStateFlow(
         ToDoItemUIModel(
             text = "",
-            priorityValue = R.string.no,
+            priorityValue = ToDoItemPriority.NORMAL.value,
             deadLineDate = null,
         )
     )
-    val uiStateFlow: StateFlow<ToDoItemUIModel> = _currentToDoItemUIModel
+    val uiStateFlow: StateFlow<ToDoItemUIModel> = _currentToDoItemUIModelMutableStateFlow
 
     fun onSavePressed(toDoItemId: String?) {
-        val toDoItemUIModel = _currentToDoItemUIModel.value
+        val toDoItemUIModel = _currentToDoItemUIModelMutableStateFlow.value
         if (toDoItemId == null) {
             todoItemsRepository.addToDoItem(
                 toDoItemUIMapper.toToDoItem(toDoItemUIModel)
@@ -47,7 +46,7 @@ class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
         if (toDoItemId != null) {
             val toDoItem: ToDoItem = todoItemsRepository.getToDoItem(toDoItemId)
             val toDoItemUIModel = toDoItemUIMapper.toToDoItemUIModel(toDoItem)
-            _currentToDoItemUIModel.value = toDoItemUIModel
+            _currentToDoItemUIModelMutableStateFlow.value = toDoItemUIModel
         }
     }
 
@@ -58,32 +57,36 @@ class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun onDeadLineSwitchPressed() {
-        val currentToDoItemUIModel = _currentToDoItemUIModel.value
+        val currentToDoItemUIModel = _currentToDoItemUIModelMutableStateFlow.value
         val deadLineDate = if (currentToDoItemUIModel.deadLineDate == null) {
             Date().time
         } else {
             null
         }
-        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
-            deadLineDate = deadLineDate
-        )
+        _currentToDoItemUIModelMutableStateFlow.value =
+            _currentToDoItemUIModelMutableStateFlow.value.copy(
+                deadLineDate = deadLineDate
+            )
     }
 
     fun onDeadLineDateChanged(dateLong: Long) {
-        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
-            deadLineDate = dateLong
-        )
+        _currentToDoItemUIModelMutableStateFlow.value =
+            _currentToDoItemUIModelMutableStateFlow.value.copy(
+                deadLineDate = dateLong
+            )
     }
 
     fun textChanged(text: String) {
-        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
-            text = text
-        )
+        _currentToDoItemUIModelMutableStateFlow.value =
+            _currentToDoItemUIModelMutableStateFlow.value.copy(
+                text = text
+            )
     }
 
     fun onSpinnerItemSelectedListener(priorityStringId: Int) {
-        _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
-            priorityValue = priorityStringId
-        )
+        _currentToDoItemUIModelMutableStateFlow.value =
+            _currentToDoItemUIModelMutableStateFlow.value.copy(
+                priorityValue = priorityStringId
+            )
     }
 }
