@@ -21,7 +21,7 @@ class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
     private val _currentToDoItemUIModel = MutableStateFlow(
         ToDoItemUIModel(
             text = "",
-            priorityStringId = R.string.no,
+            priorityValue = R.string.no,
             deadLineDate = null,
         )
     )
@@ -34,29 +34,11 @@ class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
                 toDoItemUIMapper.toToDoItem(toDoItemUIModel)
             )
         } else {
-            val priority = when (toDoItemUIModel.priorityStringId) {
-                R.string.no -> {
-                    ToDoItemPriority.NORMAL
-                }
-
-                R.string.high -> {
-                    ToDoItemPriority.HIGH
-                }
-
-                R.string.low -> {
-                    ToDoItemPriority.LOW
-                }
-
-                else -> {
-                    throw IllegalStateException()
-                }
-            }
-
             todoItemsRepository.updateToDoItem(
                 toDoItemId = toDoItemId,
                 text = toDoItemUIModel.text,
                 deadLineDate = toDoItemUIModel.deadLineDate,
-                priority = priority,
+                priority = ToDoItemPriority.from(toDoItemUIModel.priorityValue),
             )
         }
     }
@@ -101,7 +83,7 @@ class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
 
     fun onSpinnerItemSelectedListener(priorityStringId: Int) {
         _currentToDoItemUIModel.value = _currentToDoItemUIModel.value.copy(
-            priorityStringId = priorityStringId
+            priorityValue = priorityStringId
         )
     }
 }

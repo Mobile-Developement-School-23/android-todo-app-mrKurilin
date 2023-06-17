@@ -80,7 +80,7 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
                     position: Int,
                     id: Long
                 ) {
-                    toDoEntryViewModel.onSpinnerItemSelectedListener(getPriorityStringIdFromSpinner())
+                    toDoEntryViewModel.onSpinnerItemSelectedListener(position)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -120,45 +120,11 @@ class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
         binding.datePickerCalendarView.date = toDoItemUIModel.deadLineDate ?: Date().time
 
-        binding.prioritySpinner.setSelection(when(toDoItemUIModel.priorityStringId){
-            R.string.no -> {
-                0
-            }
-            R.string.high -> {
-                2
-            }
-            R.string.low -> {
-                1
-            }
-
-            else -> {
-                throw IllegalStateException()
-            }
-        })
+        binding.prioritySpinner.setSelection(toDoItemUIModel.priorityValue)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun getPriorityStringIdFromSpinner(): Int {
-        return when (binding.prioritySpinner.selectedItem.toString()) {
-            getString(R.string.high) -> {
-                R.string.high
-            }
-
-            getString(R.string.low) -> {
-                R.string.low
-            }
-
-            getString(R.string.no) -> {
-                R.string.no
-            }
-
-            else -> {
-                throw IllegalStateException()
-            }
-        }
     }
 }
