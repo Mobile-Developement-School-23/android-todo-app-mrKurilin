@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">ToDoApp</string>
+    <string name="my_to_do_list">Мои дела</string>
+    <string name="add_to_do_item">Добавить задачу</string>
+    <string name="done_count">Выполнено — %1$d</string>
+    <string name="save">Сохранить</string>
+    <string name="what_need_to_do">Что надо сделать…</string>
+    <string name="priority">Приоритет</string>
+    <string name="delete">Удалить</string>
+    <string name="low">Низкий</string>
+    <string name="high"><font fgcolor='#FF0000'>!! Высокий</font></string>
+    <string name="no">Нет</string>
+    <string name="information">Информация</string>
+    <string name="close">Закрыть</string>
+    <string name="do_before_date">Сделать до</string>
+    <string name="hide_additional_buttons_button">Скрыть дополнительные кнопки</string>
+
+    <string-array name="priorities">
+        <item>@string/low</item>
+        <item>@string/no</item>
+        <item>@string/high</item>
+    </string-array>
 </resources>
