@@ -10,19 +10,19 @@
         android:label="ToDoListFragment">
         <action
             android:id="@+id/action_toDoListFragment_to_toDoEntryFragment"
-            app:destination="@id/toDoEntryFragment"/>
+            app:destination="@id/toDoItemEntryFragment"/>
     </fragment>
     <fragment
-        android:id="@+id/toDoEntryFragment"
-        android:name="com.example.todoapp.presentation.to_do_item_entry.ToDoEntryFragment"
-        android:label="ToDoEntryFragment">
+        android:id="@+id/toDoItemEntryFragment"
+        android:name="com.example.todoapp.presentation.to_do_item_entry.ToDoItemEntryFragment"
+        android:label="ToDoItemEntryFragment">
         <argument
             android:name="toDoItemId"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <action
-            android:id="@+id/action_toDoEntryFragment_to_toDoListFragment"
+            android:id="@+id/action_toDoItemEntryFragment_to_toDoListFragment"
             app:destination="@id/toDoListFragment" />
     </fragment>
 </navigation>

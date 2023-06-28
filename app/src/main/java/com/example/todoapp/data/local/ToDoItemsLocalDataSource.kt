@@ -2,96 +2,80 @@ package com.example.todoapp.data.local
 
 import android.content.SharedPreferences
 import com.example.todoapp.data.local.model.ToDoItemLocal
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import java.util.Date
+import com.example.todoapp.data.remote.lastKnownRevision
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 import kotlin.random.Random
 
-private const val SHARED_PREF_LIST_KEY = "SHARED_PREF_LIST_KEY"
-
-class ToDoItemsLocalDataSource(
+class ToDoItemsLocalDataSource @Inject constructor(
     private val sharedPreferences: SharedPreferences,
+    private val toDoItemLocalDao: ToDoItemLocalDao,
 ) {
 
-    private val gson = Gson()
-    private val type = object : TypeToken<List<ToDoItemLocal>>() {}.type
-
-    private val toDoListMutableStateFlow = MutableStateFlow(
-        try {
-            gson.fromJson(
-                sharedPreferences.getString(SHARED_PREF_LIST_KEY, ""),
-                type
-            ) as List<ToDoItemLocal>
-        } catch (exception: NullPointerException) {
-            listOf()
-        }
-    )
-
     init {
-        if (toDoListMutableStateFlow.value.isEmpty()) {
+        if (toDoItemLocalDao.getToDoItemIdList().isEmpty()) {
             fillListForExample()
         }
     }
 
-    fun getToDoItemListStateFlow(): StateFlow<List<ToDoItemLocal>> {
-        return toDoListMutableStateFlow.asStateFlow()
+    fun getToDoItemListFlow(): Flow<List<ToDoItemLocal>> {
+        return toDoItemLocalDao.getToDoItemLocalListFlow()
     }
 
     fun addToDoItem(toDoItemLocal: ToDoItemLocal) {
-        val list = toDoListMutableStateFlow.value.toMutableList()
-        list.add(toDoItemLocal)
-        toDoListMutableStateFlow.value = list
-        sharedPreferences.edit().putString(
-            SHARED_PREF_LIST_KEY,
-            gson.toJson(list)
-        ).apply()
+        toDoItemLocalDao.insertToDoItemLocal(toDoItemLocal)
     }
 
     fun deleteToDoItemById(id: String) {
-        val list = toDoListMutableStateFlow.value.toMutableList()
-        list.removeIf { it.id == id }
-        toDoListMutableStateFlow.value = list
-        sharedPreferences.edit().putString(
-            SHARED_PREF_LIST_KEY,
-            gson.toJson(list)
-        ).apply()
-    }
-
-    fun setDoneToDoItem(toDoItemId: String) {
-        val list = toDoListMutableStateFlow.value.toMutableList()
-        val toDoItemLocal = list.first { it.id == toDoItemId }
-        val isDone = toDoItemLocal.isDone
-        val newToDoItem = toDoItemLocal.copy(isDone = !isDone)
-        list[list.indexOf(toDoItemLocal)] = newToDoItem
-        updateLocalList(list)
+        toDoItemLocalDao.deleteToDoItemById(id)
     }
 
     fun getToDoItemLocal(toDoItemId: String): ToDoItemLocal {
-        return toDoListMutableStateFlow.value.first { it.id == toDoItemId }
+        return toDoItemLocalDao.getToDoItemLocalById(toDoItemId)
     }
 
     fun updateToDoItemLocal(toDoItemLocal: ToDoItemLocal) {
-        val list = toDoListMutableStateFlow.value.toMutableList()
-        list[list.indexOfFirst { it.id == toDoItemLocal.id }] = toDoItemLocal.copy(
-            editDateMillis = Date().time
-        )
-        updateLocalList(list)
+        toDoItemLocalDao.updateToDoItemLocal(toDoItemLocal)
     }
 
-    private fun updateLocalList(list: List<ToDoItemLocal>) {
-        toDoListMutableStateFlow.value = list
-        sharedPreferences.edit().putString(
-            SHARED_PREF_LIST_KEY,
-            gson.toJson(list)
-        ).apply()
+    fun updateLocalList(remoteList: List<ToDoItemLocal>, revision: Int) {
+        val remoteToItemsById = remoteList.associateBy { it.id }
+        val localToItemsWithoutRemoteActionsById = getToDoItemsWithoutRemoteActions().associateBy {
+            it.id
+        }
+
+        localToItemsWithoutRemoteActionsById.keys.subtract(remoteToItemsById.keys).forEach { id ->
+            toDoItemLocalDao.deleteToDoItemById(id)
+        }
+
+        remoteToItemsById.keys.subtract(localToItemsWithoutRemoteActionsById.keys).forEach { id ->
+            val toDoItemLocal = remoteToItemsById[id]
+            if (toDoItemLocal != null) toDoItemLocalDao.insertToDoItemLocal(toDoItemLocal)
+        }
+
+        for (id in remoteToItemsById.keys.intersect(localToItemsWithoutRemoteActionsById.keys)) {
+            val toDoItemLocalFromRemote = remoteToItemsById[id] ?: continue
+            val localToDoItemLocal = localToItemsWithoutRemoteActionsById[id] ?: continue
+
+            if (localToDoItemLocal.editDateMillis < toDoItemLocalFromRemote.editDateMillis) {
+                toDoItemLocalDao.updateToDoItemLocal(toDoItemLocalFromRemote)
+            }
+        }
+
+        sharedPreferences.edit().putInt(lastKnownRevision, revision).apply()
+    }
+
+    private fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal> {
+        return toDoItemLocalDao.getToDoItemsWithoutRemoteActions()
+    }
+
+    fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal> {
+        return toDoItemLocalDao.getToDoItemsToUpdateRemote()
     }
 
     private fun clearList() {
-        toDoListMutableStateFlow.value.forEach {
-            deleteToDoItemById(it.id)
+        toDoItemLocalDao.getToDoItemIdList().forEach {
+            deleteToDoItemById(it)
         }
     }
 
@@ -102,8 +86,8 @@ class ToDoItemsLocalDataSource(
                 text = "Купить что-то",
                 isDone = false,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = 0,
+                editDateMillis = 0,
+                importance = 0,
                 deadLineDateMillis = null,
             )
         )
@@ -114,8 +98,8 @@ class ToDoItemsLocalDataSource(
                 text = "Купить что-то, где-то, зачем-то, но зачем не очень понятно",
                 isDone = false,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = Random.nextInt(0, 2),
+                editDateMillis = 0,
+                importance = Random.nextInt(0, 2),
                 deadLineDateMillis = null,
             )
         )
@@ -126,8 +110,8 @@ class ToDoItemsLocalDataSource(
                 text = "Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обрезается текст при количестве строк более трёх",
                 isDone = false,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = Random.nextInt(0, 2),
+                editDateMillis = 0,
+                importance = Random.nextInt(0, 2),
                 deadLineDateMillis = null,
             )
         )
@@ -138,8 +122,8 @@ class ToDoItemsLocalDataSource(
                 text = "Купить что-то с низким приоритетом",
                 isDone = false,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = 0,
+                editDateMillis = 0,
+                importance = 0,
                 deadLineDateMillis = null,
             )
         )
@@ -150,8 +134,8 @@ class ToDoItemsLocalDataSource(
                 text = "Купить что-то с высоким приоритетом",
                 isDone = false,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = 2,
+                editDateMillis = 0,
+                importance = 2,
                 deadLineDateMillis = null,
             )
         )
@@ -162,8 +146,8 @@ class ToDoItemsLocalDataSource(
                 text = "Выполненная задача",
                 isDone = true,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = 1,
+                editDateMillis = 0,
+                importance = 1,
                 deadLineDateMillis = null,
             )
         )
@@ -174,8 +158,8 @@ class ToDoItemsLocalDataSource(
                 text = "Задача с дедлайном",
                 isDone = true,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = 1,
+                editDateMillis = 0,
+                importance = 1,
                 deadLineDateMillis = 1686766582536,
             )
         )
@@ -186,8 +170,8 @@ class ToDoItemsLocalDataSource(
                 text = "Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела ",
                 isDone = false,
                 creationDateMillis = 0,
-                editDateMillis = null,
-                priorityInt = 1,
+                editDateMillis = 0,
+                importance = 1,
                 deadLineDateMillis = 1686766582536,
             )
         )
@@ -199,8 +183,8 @@ class ToDoItemsLocalDataSource(
                     text = Random.nextLong().toString(),
                     isDone = Random.nextBoolean(),
                     creationDateMillis = 0,
-                    editDateMillis = null,
-                    priorityInt = Random.nextInt(0,2),
+                    editDateMillis = 0,
+                    importance = Random.nextInt(0, 2),
                     deadLineDateMillis = Random.nextLong(),
                 )
             )

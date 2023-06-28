@@ -56,9 +56,34 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:animateLayoutChanges="true"
             android:padding="16dp">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/main_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="
+                text_edit_text,
+                priority_divider,
+                priority_spinner,
+                priority_text_view,
+                deadline_text_view,
+                deadline_divider,
+                deadline_switch,
+                delete_text_view,
+                deadline_group" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/deadline_group"
@@ -90,8 +115,8 @@
                 android:id="@+id/priority_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/priorities"
                 android:layout_margin="8dp"
+                android:entries="@array/priorities"
                 android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="@id/priority_barrier"
                 app:layout_constraintEnd_toEndOf="parent"

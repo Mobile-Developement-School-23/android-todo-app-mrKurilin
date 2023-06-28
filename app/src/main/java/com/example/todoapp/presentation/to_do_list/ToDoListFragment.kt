@@ -4,22 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentToDoListBinding
-import com.example.todoapp.presentation.to_do_list.model.ToDoListItemUIModel
-import kotlinx.coroutines.flow.first
+import com.example.todoapp.di.appComponent
+import com.example.todoapp.di.lazyViewModel
 import kotlinx.coroutines.launch
 
 class ToDoListFragment : Fragment() {
 
-    private val toDoListViewModel: ToDoListViewModel by viewModels()
+    private val toDoListViewModel: ToDoListViewModel by lazyViewModel {
+        appComponent().toDoListViewModel()
+    }
 
     private var _binding: FragmentToDoListBinding? = null
     private val binding get() = _binding!!
@@ -77,40 +78,19 @@ class ToDoListFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
-                toDoListViewModel.toDoListStateFlow.collect { toDoItemList ->
-                    if (!toDoListViewModel.isDoneItemsVisibleStateFlow.value) {
-                        adapter.setToDoItems(toDoItemList.filter { !it.isDone })
-                    } else {
-                        adapter.setToDoItems(toDoItemList)
-                    }
+                toDoListViewModel.getToDoItemListFlow().collect { toDoItemList ->
+                    adapter.setToDoItems(toDoItemList)
                     val doneCount = toDoItemList.count { it.isDone }
                     binding.doneCountTextView.text = getString(R.string.done_count, doneCount)
                 }
             }
 
             launch {
-                toDoListViewModel.isDoneItemsVisibleStateFlow.collect { isVisible ->
-                    val drawableRes: Int
-                    val toDoItemList: List<ToDoListItemUIModel>
-
-                    if (isVisible) {
-                        drawableRes = R.drawable.visibility
-                        toDoItemList = toDoListViewModel.toDoListStateFlow.first()
-                    } else {
-                        drawableRes = R.drawable.visibility_off
-                        toDoItemList = toDoListViewModel.toDoListStateFlow.first().filter {
-                            !it.isDone
-                        }
+                toDoListViewModel.textToShowFlow.collect { text ->
+                    if (text != null) {
+                        Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
+                        toDoListViewModel.toastShown()
                     }
-
-                    binding.doneItemsVisibilityImageView.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            requireContext(),
-                            drawableRes
-                        )
-                    )
-
-                    adapter.setToDoItems(toDoItemList)
                 }
             }
         }

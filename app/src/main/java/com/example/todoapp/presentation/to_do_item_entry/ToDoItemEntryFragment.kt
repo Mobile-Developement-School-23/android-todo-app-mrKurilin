@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentEntryToDoItemBinding
+import com.example.todoapp.di.appComponent
+import com.example.todoapp.di.lazyViewModel
 import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -20,10 +21,12 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class ToDoEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
+class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
-    private val toDoEntryViewModel: ToDoItemEntryViewModel by viewModels()
-    private val args: ToDoEntryFragmentArgs by navArgs()
+    private val toDoEntryViewModel: ToDoItemEntryViewModel by lazyViewModel {
+        appComponent().toDoItemEntryViewModel()
+    }
+    private val args: ToDoItemEntryFragmentArgs by navArgs()
 
     private var _binding: FragmentEntryToDoItemBinding? = null
     private val binding get() = _binding!!

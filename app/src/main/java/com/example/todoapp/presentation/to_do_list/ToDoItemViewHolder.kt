@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.todoapp.R
 import com.example.todoapp.databinding.ToDoItemViewHolderBinding
-import com.example.todoapp.domain.model.ToDoItemPriority
+import com.example.todoapp.domain.model.ToDoItemImportance
 import com.example.todoapp.presentation.to_do_list.model.ToDoListItemUIModel
 
 class ToDoItemViewHolder(
@@ -99,16 +99,16 @@ class ToDoItemViewHolder(
         val paintFlags: Int
 
         when (toDoListItemUIModel.priority) {
-            ToDoItemPriority.LOW -> {
+            ToDoItemImportance.LOW -> {
                 binding.priorityImageView.visibility = View.VISIBLE
                 binding.priorityImageView.setImageDrawable(lowPriorityDrawable)
             }
 
-            ToDoItemPriority.NORMAL -> {
+            ToDoItemImportance.BASIC -> {
                 binding.priorityImageView.visibility = View.GONE
             }
 
-            ToDoItemPriority.HIGH -> {
+            ToDoItemImportance.HIGH -> {
                 binding.priorityImageView.visibility = View.VISIBLE
                 binding.priorityImageView.setImageDrawable(highPriorityDrawable)
             }
@@ -117,7 +117,7 @@ class ToDoItemViewHolder(
         if (toDoListItemUIModel.isDone) {
             binding.isDoneCheckbox.buttonTintList = greenColorStateList
             paintFlags = binding.textTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-        } else if (toDoListItemUIModel.priority == ToDoItemPriority.HIGH) {
+        } else if (toDoListItemUIModel.priority == ToDoItemImportance.HIGH) {
             binding.isDoneCheckbox.buttonTintList = redColorStateList
             paintFlags = binding.textTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         } else {

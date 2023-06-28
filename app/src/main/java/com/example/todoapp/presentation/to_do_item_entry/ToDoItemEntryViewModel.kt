@@ -1,58 +1,63 @@
 package com.example.todoapp.presentation.to_do_item_entry
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.example.todoapp.ToDoApp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.todoapp.domain.model.ToDoItem
-import com.example.todoapp.domain.model.ToDoItemPriority
+import com.example.todoapp.domain.model.ToDoItemImportance
+import com.example.todoapp.domain.usecase.AddToDoItemUseCase
+import com.example.todoapp.domain.usecase.DeleteToDoItemByIdUseCase
+import com.example.todoapp.domain.usecase.GetToDoItemByIdUseCase
+import com.example.todoapp.domain.usecase.UpdateToDoItemUseCase
+import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIMapper
 import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.util.Date
+import javax.inject.Inject
 
-class ToDoItemEntryViewModel(app: Application) : AndroidViewModel(app) {
-
-    private val toDoApp = app as ToDoApp
-
-    private val todoItemsRepository = toDoApp.provideTodoItemsRepository()
-    private val toDoItemUIMapper = toDoApp.provideToDoItemUIMapper()
+class ToDoItemEntryViewModel @Inject constructor(
+    private val toDoItemUIMapper: ToDoItemUIMapper,
+    private val addToDoItemUseCase: AddToDoItemUseCase,
+    private val updateToDoItemUseCase: UpdateToDoItemUseCase,
+    private val deleteToDoItemByIdUseCase: DeleteToDoItemByIdUseCase,
+    private val getToDoItemByIdUseCase: GetToDoItemByIdUseCase,
+) : ViewModel() {
 
     private val _currentToDoItemUIModelMutableStateFlow = MutableStateFlow(
         ToDoItemUIModel(
             text = "",
-            priorityValue = ToDoItemPriority.NORMAL.value,
+            priorityValue = ToDoItemImportance.BASIC.value,
             deadLineDate = null,
         )
     )
     val uiStateFlow: StateFlow<ToDoItemUIModel> = _currentToDoItemUIModelMutableStateFlow
 
-    fun onSavePressed(toDoItemId: String?) {
+    fun onSavePressed(toDoItemId: String?) = viewModelScope.launch {
         val toDoItemUIModel = _currentToDoItemUIModelMutableStateFlow.value
         if (toDoItemId == null) {
-            todoItemsRepository.addToDoItem(
-                toDoItemUIMapper.toToDoItem(toDoItemUIModel)
-            )
+            addToDoItemUseCase.add(toDoItemUIMapper.map(toDoItemUIModel))
         } else {
-            todoItemsRepository.updateToDoItem(
+            updateToDoItemUseCase.update(
                 toDoItemId = toDoItemId,
                 text = toDoItemUIModel.text,
                 deadLineDate = toDoItemUIModel.deadLineDate,
-                priority = ToDoItemPriority.from(toDoItemUIModel.priorityValue),
+                importance = ToDoItemImportance.from(toDoItemUIModel.priorityValue),
             )
         }
     }
 
-    fun loadToDoItem(toDoItemId: String?) {
+    fun loadToDoItem(toDoItemId: String?) = viewModelScope.launch {
         if (toDoItemId != null) {
-            val toDoItem: ToDoItem = todoItemsRepository.getToDoItem(toDoItemId)
-            val toDoItemUIModel = toDoItemUIMapper.toToDoItemUIModel(toDoItem)
+            val toDoItem: ToDoItem = getToDoItemByIdUseCase.get(toDoItemId)
+            val toDoItemUIModel = toDoItemUIMapper.map(toDoItem)
             _currentToDoItemUIModelMutableStateFlow.value = toDoItemUIModel
         }
     }
 
-    fun deleteToDoItem(toDoItemId: String?) {
+    fun deleteToDoItem(toDoItemId: String?) = viewModelScope.launch {
         if (toDoItemId != null) {
-            todoItemsRepository.deleteToDoItem(toDoItemId)
+            deleteToDoItemByIdUseCase.delete(toDoItemId)
         }
     }
 
