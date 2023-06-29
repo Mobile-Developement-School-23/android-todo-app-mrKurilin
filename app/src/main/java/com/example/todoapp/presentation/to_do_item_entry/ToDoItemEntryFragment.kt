@@ -23,10 +23,11 @@ import java.util.Locale
 
 class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
+    private val args: ToDoItemEntryFragmentArgs by navArgs()
+
     private val toDoEntryViewModel: ToDoItemEntryViewModel by lazyViewModel {
         appComponent().toDoItemEntryViewModel()
     }
-    private val args: ToDoItemEntryFragmentArgs by navArgs()
 
     private var _binding: FragmentEntryToDoItemBinding? = null
     private val binding get() = _binding!!

@@ -38,16 +38,36 @@
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.5" />
 
-            <ImageButton
-                android:id="@+id/done_items_visibility_image_view"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_gravity="end|bottom"
-                android:backgroundTint="@android:color/transparent"
-                android:contentDescription="@string/app_name"
-                android:minHeight="48dp"
-                android:paddingBottom="12dp"
-                android:src="@drawable/visibility" />
+                android:paddingBottom="12dp">
+
+                <ProgressBar
+                    android:id="@+id/data_progress_bar"
+                    android:layout_width="48dp"
+                    android:visibility="gone"
+                    android:layout_height="48dp"/>
+
+                <ImageButton
+                    android:id="@+id/offline_warning_image_view"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:visibility="gone"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/baseline_warning_amber_24" />
+
+                <ImageButton
+                    android:id="@+id/done_items_visibility_image_view"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/visibility" />
+
+            </LinearLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
