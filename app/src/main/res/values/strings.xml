@@ -14,6 +14,13 @@
     <string name="close">Закрыть</string>
     <string name="do_before_date">Сделать до</string>
     <string name="hide_additional_buttons_button">Скрыть дополнительные кнопки</string>
+    <string name="failed_to_login">Не удалось авторизоваться</string>
+    <string name="welcome_to_app">Добро пожаловать в ToDoApp!</string>
+    <string name="login_explaining">Для синхронизации списка дел по сети необходимо авторизоваться с Яндeкс ID</string>
+    <string name="use_offline">Пользоваться автономно</string>
+    <string name="or">или</string>
+    <string name="login_with_yandex_id">Войти с Яндекс ID</string>
+    <string name="by_mrkurilin">by mrKurilin</string>
 
     <string-array name="priorities">
         <item>@string/low</item>

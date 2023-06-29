@@ -30,12 +30,6 @@ class ToDoListViewModel @Inject constructor(
     private val _textToShowFlow = MutableStateFlow<String?>(null)
     val textToShowFlow: StateFlow<String?> = _textToShowFlow
 
-    init {
-        viewModelScope.launch {
-            updateDataUseCase.update()
-        }
-    }
-
     fun deleteToDoItem(toDoItemId: String) = viewModelScope.launch {
         deleteToDoItemByIdUseCase.delete(toDoItemId)
     }
@@ -66,5 +60,9 @@ class ToDoListViewModel @Inject constructor(
                 list
             }
         }
+    }
+
+    suspend fun updateData() = viewModelScope.launch {
+        updateDataUseCase.update()
     }
 }

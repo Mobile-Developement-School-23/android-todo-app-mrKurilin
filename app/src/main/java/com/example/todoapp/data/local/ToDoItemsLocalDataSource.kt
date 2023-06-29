@@ -1,6 +1,7 @@
 package com.example.todoapp.data.local
 
 import android.content.SharedPreferences
+import com.example.todoapp.data.local.model.ToDoItemAction
 import com.example.todoapp.data.local.model.ToDoItemLocal
 import com.example.todoapp.data.remote.lastKnownRevision
 import kotlinx.coroutines.flow.Flow
@@ -89,6 +90,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = 0,
                 deadLineDateMillis = null,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -101,6 +103,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = Random.nextInt(0, 2),
                 deadLineDateMillis = null,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -113,6 +116,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = Random.nextInt(0, 2),
                 deadLineDateMillis = null,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -125,6 +129,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = 0,
                 deadLineDateMillis = null,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -137,6 +142,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = 2,
                 deadLineDateMillis = null,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -149,6 +155,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = 1,
                 deadLineDateMillis = null,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -161,6 +168,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = 1,
                 deadLineDateMillis = 1686766582536,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -173,6 +181,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 editDateMillis = 0,
                 importance = 1,
                 deadLineDateMillis = 1686766582536,
+                toDoItemAction = ToDoItemAction.ADD,
             )
         )
 
@@ -186,6 +195,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                     editDateMillis = 0,
                     importance = Random.nextInt(0, 2),
                     deadLineDateMillis = Random.nextLong(),
+                    toDoItemAction = ToDoItemAction.ADD,
                 )
             )
         }
