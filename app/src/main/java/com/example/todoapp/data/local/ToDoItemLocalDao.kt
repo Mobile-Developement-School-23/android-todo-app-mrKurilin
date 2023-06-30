@@ -18,26 +18,23 @@ interface ToDoItemLocalDao {
     fun getToDoItemLocalListFlow(): Flow<List<ToDoItemLocal>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertToDoItemLocal(toDoItemLocal: ToDoItemLocal)
+    suspend fun insertToDoItemLocal(toDoItemLocal: ToDoItemLocal)
 
     @Update
-    fun updateToDoItemLocal(toDoItemLocal: ToDoItemLocal)
+    suspend fun updateToDoItemLocal(toDoItemLocal: ToDoItemLocal)
 
     @Query("DELETE FROM $TABLE_NAME WHERE $ID_COLUMN_NAME = :toDoItemId")
-    fun deleteToDoItemById(toDoItemId: String)
+    suspend fun deleteToDoItemById(toDoItemId: String)
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $TO_DO_ITEM_ACTION_COLUMN_NAME IS NOT NULL")
-    fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal>
+    suspend fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $TO_DO_ITEM_ACTION_COLUMN_NAME IS NULL")
-    fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal>
-
-    @Query("SELECT * FROM $TABLE_NAME")
-    fun getToDoItemLocalList(): List<ToDoItemLocal>
+    suspend fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal>
 
     @Query("SELECT $ID_COLUMN_NAME FROM $TABLE_NAME")
     fun getToDoItemIdList(): List<String>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $ID_COLUMN_NAME = :toDoItemId")
-    fun getToDoItemLocalById(toDoItemId: String): ToDoItemLocal
+    suspend fun getToDoItemLocalById(toDoItemId: String): ToDoItemLocal
 }

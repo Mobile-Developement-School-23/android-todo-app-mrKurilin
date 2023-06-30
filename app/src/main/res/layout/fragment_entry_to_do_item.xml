@@ -45,6 +45,13 @@
                 android:textSize="14sp"
                 tools:ignore="TextContrastCheck" />
 
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:visibility="gone" />
+
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -59,31 +66,6 @@
             android:layout_height="match_parent"
             android:animateLayoutChanges="true"
             android:padding="16dp">
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.constraintlayout.widget.Group
-                android:id="@+id/main_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:constraint_referenced_ids="
-                text_edit_text,
-                priority_divider,
-                priority_spinner,
-                priority_text_view,
-                deadline_text_view,
-                deadline_divider,
-                deadline_switch,
-                delete_text_view,
-                deadline_group" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/deadline_group"

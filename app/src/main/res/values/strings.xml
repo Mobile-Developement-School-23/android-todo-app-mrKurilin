@@ -21,6 +21,16 @@
     <string name="or">или</string>
     <string name="login_with_yandex_id">Войти с Яндекс ID</string>
     <string name="by_mrkurilin">by mrKurilin</string>
+    <string name="log_out">Выйти</string>
+    <string name="sure_to_log_out">Вы уверены что хотите выйти из Яндекс аккаунта?</string>
+    <string name="yes">Да</string>
+    <string name="no_network">Нет интернет соединения</string>
+    <string name="it_is_clear">Понятно</string>
+    <string name="cant_sync_without_network">Невозможно синхронизировать список дел с сервером т.к. отсутствует интернет соедение. Работа в автономном режиме.</string>
+    <string name="not_authorized">Вы не авторизованы</string>
+    <string name="cant_sync_without_auth">Невозможно синхронизировать список дел с сервером т.к. вы не авторизованы. Работа в автономном режиме.</string>
+    <string name="data_synchronized">Список дел синхронизирован с сервером</string>
+    <string name="synchronization_error">Ошибка синхронизации</string>
 
     <string-array name="priorities">
         <item>@string/low</item>

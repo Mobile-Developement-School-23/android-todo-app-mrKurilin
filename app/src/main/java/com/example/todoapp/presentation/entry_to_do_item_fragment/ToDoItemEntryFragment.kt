@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_item_entry
+package com.example.todoapp.presentation.entry_to_do_item_fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,7 +14,7 @@ import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentEntryToDoItemBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
-import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIModel
+import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -56,12 +56,10 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
         binding.saveTextView.setOnClickListener {
             toDoEntryViewModel.onSavePressed(args.toDoItemId)
-            findNavController().popBackStack()
         }
 
         binding.deleteTextView.setOnClickListener {
             toDoEntryViewModel.deleteToDoItem(args.toDoItemId)
-            findNavController().popBackStack()
         }
 
         binding.deadlineSwitch.setOnClickListener {
@@ -94,14 +92,33 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
         lifecycleScope.launch {
             launch {
-                toDoEntryViewModel.uiStateFlow.collect { toDoItemUIModel ->
-                    updateUI(toDoItemUIModel)
+                toDoEntryViewModel.toDoItemEntryUIStateMutableStateFlow.collect { toDoItemEntryUIState ->
+                    updateUI(toDoItemEntryUIState)
                 }
             }
         }
     }
 
-    private fun updateUI(toDoItemUIModel: ToDoItemUIModel) {
+    private fun updateUI(toDoItemEntryUIState: ToDoItemEntryUIState) {
+        when (toDoItemEntryUIState) {
+            ToDoItemEntryUIState.CanBeClosed -> {
+                findNavController().popBackStack()
+            }
+
+            ToDoItemEntryUIState.Loading -> {
+                binding.saveTextView.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
+            }
+
+            is ToDoItemEntryUIState.ToDoItemUIModelUpdated -> {
+                binding.saveTextView.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                bindToDoItemUIModel(toDoItemEntryUIState.toDoItemUIModel)
+            }
+        }
+    }
+
+    private fun bindToDoItemUIModel(toDoItemUIModel: ToDoItemUIModel) {
 
         binding.saveTextView.isEnabled = toDoItemUIModel.text.isNotEmpty()
 

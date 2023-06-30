@@ -16,4 +16,5 @@
     <color name="back_secondary">#FFFFFF</color>
     <color name="back_elevated">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="yellow">#FFEB3B</color>
 </resources>

@@ -9,7 +9,7 @@ class UpdateDataUseCase @Inject constructor(
     private val toDoItemsRepository: ToDoItemsRepository
 ) {
 
-    suspend fun update() = withContext(Dispatchers.IO) {
-        toDoItemsRepository.updateData()
+    suspend fun update(): Result<Any?> = withContext(Dispatchers.IO) {
+        return@withContext toDoItemsRepository.getSynchronizationResult()
     }
 }

@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
-import com.example.todoapp.presentation.to_do_list.ToDoItemViewHolder
+import com.example.todoapp.presentation.to_do_list_fragment.ToDoItemViewHolder
 
 abstract class ToDoItemSwipeGesture(
     private val deleteIcon: Drawable,

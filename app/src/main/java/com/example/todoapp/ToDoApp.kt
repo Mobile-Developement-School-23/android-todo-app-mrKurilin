@@ -29,16 +29,17 @@ class ToDoApp : Application() {
             context = this,
             currentDeviceId = CurrentDeviceId(Settings.Secure.ANDROID_ID)
         )
-
-        val updateInterval = 8L // hours
+        appComponent.inject(this)
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val workRequest = PeriodicWorkRequestBuilder<LocalListUpdateWorker>(
-            updateInterval,
-            TimeUnit.HOURS
+            8,
+            TimeUnit.HOURS,
+            1,
+            TimeUnit.HOURS,
         ).setConstraints(constraints).build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(

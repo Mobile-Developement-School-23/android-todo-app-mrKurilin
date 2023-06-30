@@ -1,5 +1,7 @@
 package com.example.todoapp.di
 
+import android.content.Context
+import android.net.ConnectivityManager
 import com.example.todoapp.data.remote.AuthorizationInterceptor
 import com.example.todoapp.data.remote.RetryInterceptor
 import com.example.todoapp.data.remote.ToDoApiService
@@ -43,6 +45,13 @@ interface RemoteDataModule {
                 .client(okHttpClient)
                 .build()
                 .create(ToDoApiService::class.java)
+        }
+
+        @Provides
+        fun provideConnectivityManager(
+            context: Context
+        ): ConnectivityManager {
+            return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         }
     }
 }

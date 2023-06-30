@@ -32,20 +32,28 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
+        if (loginViewModel.isAuthorized()) {
+            findNavController().navigate(R.id.action_loginFragment_to_toDoListFragment)
+        }
+
         sdk = YandexAuthSdk(requireContext(), YandexAuthOptions(requireContext()))
 
         launcher = registerForActivityResult(YandexSignInActivityResultContract()) { pair ->
-            val token = sdk.extractToken(pair.first, pair.second)
-            if (token != null) {
-                loginViewModel.putToken(token.value)
-                findNavController().navigate(R.id.action_loginFragment_to_toDoListFragment)
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    getText(R.string.failed_to_login),
-                    Toast.LENGTH_LONG
-                ).show()
+            try {
+                val token = sdk.extractToken(pair.first, pair.second)
+                if (token != null) {
+                    loginViewModel.putToken(token.value)
+                    findNavController().navigate(R.id.action_loginFragment_to_toDoListFragment)
+                }
+            } catch (exception: Exception) {
+                //do nothing
             }
+
+            Toast.makeText(
+                requireContext(),
+                getText(R.string.failed_to_login),
+                Toast.LENGTH_LONG
+            ).show()
         }
 
         _binding = FragmentLoginBinding.inflate(inflater, container, false)

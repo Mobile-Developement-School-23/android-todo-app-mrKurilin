@@ -1,45 +1,36 @@
 package com.example.todoapp.data.local
 
-import android.content.SharedPreferences
 import com.example.todoapp.data.local.model.ToDoItemAction
 import com.example.todoapp.data.local.model.ToDoItemLocal
-import com.example.todoapp.data.remote.lastKnownRevision
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.random.Random
 
 class ToDoItemsLocalDataSource @Inject constructor(
-    private val sharedPreferences: SharedPreferences,
     private val toDoItemLocalDao: ToDoItemLocalDao,
 ) {
-
-    init {
-        if (toDoItemLocalDao.getToDoItemIdList().isEmpty()) {
-            fillListForExample()
-        }
-    }
 
     fun getToDoItemListFlow(): Flow<List<ToDoItemLocal>> {
         return toDoItemLocalDao.getToDoItemLocalListFlow()
     }
 
-    fun addToDoItem(toDoItemLocal: ToDoItemLocal) {
+    suspend fun addToDoItem(toDoItemLocal: ToDoItemLocal) {
         toDoItemLocalDao.insertToDoItemLocal(toDoItemLocal)
     }
 
-    fun deleteToDoItemById(id: String) {
+    suspend fun deleteToDoItemById(id: String) {
         toDoItemLocalDao.deleteToDoItemById(id)
     }
 
-    fun getToDoItemLocal(toDoItemId: String): ToDoItemLocal {
+    suspend fun getToDoItemLocal(toDoItemId: String): ToDoItemLocal {
         return toDoItemLocalDao.getToDoItemLocalById(toDoItemId)
     }
 
-    fun updateToDoItemLocal(toDoItemLocal: ToDoItemLocal) {
+    suspend fun updateToDoItemLocal(toDoItemLocal: ToDoItemLocal) {
         toDoItemLocalDao.updateToDoItemLocal(toDoItemLocal)
     }
 
-    fun updateLocalList(remoteList: List<ToDoItemLocal>, revision: Int) {
+    suspend fun updateLocalList(remoteList: List<ToDoItemLocal>) {
         val remoteToItemsById = remoteList.associateBy { it.id }
         val localToItemsWithoutRemoteActionsById = getToDoItemsWithoutRemoteActions().associateBy {
             it.id
@@ -62,25 +53,23 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 toDoItemLocalDao.updateToDoItemLocal(toDoItemLocalFromRemote)
             }
         }
-
-        sharedPreferences.edit().putInt(lastKnownRevision, revision).apply()
     }
 
-    private fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal> {
+    private suspend fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal> {
         return toDoItemLocalDao.getToDoItemsWithoutRemoteActions()
     }
 
-    fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal> {
+    suspend fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal> {
         return toDoItemLocalDao.getToDoItemsToUpdateRemote()
     }
 
-    private fun clearList() {
+    suspend fun clearList() {
         toDoItemLocalDao.getToDoItemIdList().forEach {
             deleteToDoItemById(it)
         }
     }
 
-    private fun fillListForExample() {
+    private suspend fun fillListForExample() {
         addToDoItem(
             ToDoItemLocal(
                 id = Random.nextInt().toString(),

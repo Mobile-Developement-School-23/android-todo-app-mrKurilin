@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list
+package com.example.todoapp.presentation.to_do_list_fragment
 
 import android.graphics.Paint
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.todoapp.R
 import com.example.todoapp.databinding.ToDoItemViewHolderBinding
 import com.example.todoapp.domain.model.ToDoItemImportance
-import com.example.todoapp.presentation.to_do_list.model.ToDoListItemUIModel
+import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIModel
 
 class ToDoItemViewHolder(
     private val binding: ToDoItemViewHolderBinding,
@@ -80,11 +80,14 @@ class ToDoItemViewHolder(
         }
 
         binding.isDoneCheckbox.setOnClickListener {
+            it.isEnabled = false
             setDoneToDoItem(adapterPosition)
         }
     }
 
     fun bind(toDoListItemUIModel: ToDoListItemUIModel) {
+        binding.isDoneCheckbox.isEnabled = true
+        binding.isDoneCheckbox.visibility = View.VISIBLE
         binding.additionalButtons.visibility = View.GONE
         binding.isDoneCheckbox.isChecked = toDoListItemUIModel.isDone
         binding.textTextView.text = toDoListItemUIModel.text

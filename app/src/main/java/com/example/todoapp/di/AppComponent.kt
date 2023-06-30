@@ -1,10 +1,11 @@
 package com.example.todoapp.di
 
 import android.content.Context
+import com.example.todoapp.ToDoApp
 import com.example.todoapp.data.CurrentDeviceId
+import com.example.todoapp.presentation.entry_to_do_item_fragment.ToDoItemEntryViewModel
 import com.example.todoapp.presentation.login_fragment.LoginViewModel
-import com.example.todoapp.presentation.to_do_item_entry.ToDoItemEntryViewModel
-import com.example.todoapp.presentation.to_do_list.ToDoListViewModel
+import com.example.todoapp.presentation.to_do_list_fragment.ToDoListViewModel
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -34,4 +35,5 @@ interface AppComponent {
     fun toDoListViewModel(): ToDoListViewModel
 
     fun loginViewModel(): LoginViewModel
+    fun inject(toDoApp: ToDoApp)
 }

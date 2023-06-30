@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.todoapp.ToDoApp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class LocalListUpdateWorker @Inject constructor(
@@ -13,12 +11,12 @@ class LocalListUpdateWorker @Inject constructor(
     workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams) {
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        try {
-            val todoItemsRepository = (context.applicationContext as ToDoApp).todoItemsRepository
-            todoItemsRepository.updateData()
+    override suspend fun doWork(): Result {
+        val todoItemsRepository = (context.applicationContext as ToDoApp).todoItemsRepository
+        val result = todoItemsRepository.getSynchronizationResult()
+        return if (result.isSuccess) {
             Result.success()
-        } catch (e: Exception) {
+        } else {
             Result.failure()
         }
     }

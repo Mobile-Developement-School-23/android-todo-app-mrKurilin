@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient"
+    android:fitsSystemWindows="true"
     android:padding="8dp"
     tools:context=".presentation.login_fragment.LoginFragment">
 
@@ -32,15 +33,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/welcome_text_view" />
 
-    <Button
+    <TextView
         android:id="@+id/use_offline_button"
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:background="@drawable/stroked_frame"
-        android:backgroundTint="@android:color/transparent"
+        android:gravity="center"
         android:padding="8dp"
         android:text="@string/use_offline"
         android:textAllCaps="false"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/or_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
