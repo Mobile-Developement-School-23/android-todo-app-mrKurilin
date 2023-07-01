@@ -146,7 +146,11 @@ class ToDoItemsRepository @Inject constructor(
     }
 
     suspend fun clearAll() {
-        toDoItemsRemoteDataSource.clearRemoteList()
+        try {
+            toDoItemsRemoteDataSource.clearRemoteList()
+        } catch (exception: Exception) {
+            //do nothing
+        }
         toDoItemsLocalDataSource.clearList()
     }
 

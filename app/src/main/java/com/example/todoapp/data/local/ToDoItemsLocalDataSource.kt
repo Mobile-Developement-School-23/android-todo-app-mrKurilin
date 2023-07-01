@@ -55,10 +55,6 @@ class ToDoItemsLocalDataSource @Inject constructor(
         }
     }
 
-    private suspend fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal> {
-        return toDoItemLocalDao.getToDoItemsWithoutRemoteActions()
-    }
-
     suspend fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal> {
         return toDoItemLocalDao.getToDoItemsToUpdateRemote()
     }
@@ -67,6 +63,10 @@ class ToDoItemsLocalDataSource @Inject constructor(
         toDoItemLocalDao.getToDoItemIdList().forEach {
             deleteToDoItemById(it)
         }
+    }
+
+    private suspend fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal> {
+        return toDoItemLocalDao.getToDoItemsWithoutRemoteActions()
     }
 
     private suspend fun fillListForExample() {

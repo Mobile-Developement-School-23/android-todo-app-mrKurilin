@@ -18,42 +18,10 @@ class ToDoItemsRemoteDataSource @Inject constructor(
         return toDoApiService.getToDoItemListRemote()
     }
 
-    suspend fun addToDoItemRemote(
-        addToDoItemRemoteRequest: EntryToDoItemRemoteRequest,
-    ): ToDoItemRemoteResponse {
-        val lastKnownRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, 0)
-
-        return toDoApiService.addToDoItemRemote(
-            entryToDoItemRemoteRequest = addToDoItemRemoteRequest,
-            revision = lastKnownRevision
-        )
-    }
-
     suspend fun clearRemoteList() {
         toDoApiService.updateToDoItemListRemote(
             sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, 0),
             UpdateToDoItemRemoteListRequest(listOf())
-        )
-    }
-
-    suspend fun updateToDoItemRemote(
-        updateToDoItemRemoteRequest: EntryToDoItemRemoteRequest,
-    ): ToDoItemRemoteResponse {
-        val lastKnownRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, 0)
-        return toDoApiService.updateToDoItemRemote(
-            revision = lastKnownRevision,
-            id = updateToDoItemRemoteRequest.toDoItemRemote.id,
-            entryToDoItemRemoteRequest = updateToDoItemRemoteRequest
-        )
-    }
-
-    suspend fun deleteToDoItemRemoteById(
-        toDoItemId: String,
-    ): ToDoItemRemoteResponse {
-        val lastKnownRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, 0)
-        return toDoApiService.deleteToDoItemRemote(
-            id = toDoItemId,
-            revision = lastKnownRevision
         )
     }
 
@@ -80,5 +48,37 @@ class ToDoItemsRemoteDataSource @Inject constructor(
                 )
             }
         }
+    }
+
+    private suspend fun addToDoItemRemote(
+        addToDoItemRemoteRequest: EntryToDoItemRemoteRequest,
+    ): ToDoItemRemoteResponse {
+        val lastKnownRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, 0)
+
+        return toDoApiService.addToDoItemRemote(
+            entryToDoItemRemoteRequest = addToDoItemRemoteRequest,
+            revision = lastKnownRevision
+        )
+    }
+
+    private suspend fun deleteToDoItemRemoteById(
+        toDoItemId: String,
+    ): ToDoItemRemoteResponse {
+        val lastKnownRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, 0)
+        return toDoApiService.deleteToDoItemRemote(
+            id = toDoItemId,
+            revision = lastKnownRevision
+        )
+    }
+
+    private suspend fun updateToDoItemRemote(
+        updateToDoItemRemoteRequest: EntryToDoItemRemoteRequest,
+    ): ToDoItemRemoteResponse {
+        val lastKnownRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, 0)
+        return toDoApiService.updateToDoItemRemote(
+            revision = lastKnownRevision,
+            id = updateToDoItemRemoteRequest.toDoItemRemote.id,
+            entryToDoItemRemoteRequest = updateToDoItemRemoteRequest
+        )
     }
 }
