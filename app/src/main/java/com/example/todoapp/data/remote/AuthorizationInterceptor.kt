@@ -11,7 +11,7 @@ class AuthorizationInterceptor @Inject constructor(
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val token = sharedPreferences.getString(TOKEN_KEY, "")
+        val token = sharedPreferences.getString(TOKEN_KEY, "y0_AgAAAAAukPESAAobcgAAAADmkEg8iZeFqA2QQCqU92pbfTztP1YUQ_g")
         return chain.proceed(
             chain.request().newBuilder().addHeader(
                 "Authorization",
