@@ -10,10 +10,8 @@ import com.example.todoapp.domain.usecase.SetDoneToDoItemUseCase
 import com.example.todoapp.domain.usecase.UpdateDataUseCase
 import com.example.todoapp.presentation.Notification
 import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIMapper
-import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIModel
 import com.example.todoapp.presentation.util.ConnectivityStateObserver
 import com.example.todoapp.presentation.util.NetworkConnectivityState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -46,6 +44,30 @@ class ToDoListViewModel @Inject constructor(
                 handleNetworkConnectivityState(state)
             }
         }
+
+        viewModelScope.launch {
+            connectivityStateObserver.networkConnectivityState.collect { state ->
+                getToDoItemListFlowUseCase.get().map { list ->
+                    updateDoneItemsCount(list.count { it.isDone })
+                    list.map { toDoItem ->
+                        toDoListItemUIMapper.map(toDoItem)
+                    }
+                }.combine(_toDoListUIStateMutableStateFlow) { list, toDoListUIState ->
+                    if (!toDoListUIState.isDoneItemsVisible) {
+                        list.filter { !it.isDone }
+                    } else {
+                        list
+                    }
+                }.collect { list ->
+                    val currentState = _toDoListUIStateMutableStateFlow.value
+                    _toDoListUIStateMutableStateFlow.update {
+                        currentState.copy(
+                            toDoListItemUIModelList = list
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun deleteToDoItem(toDoItemId: String) = viewModelScope.launch {
@@ -71,21 +93,6 @@ class ToDoListViewModel @Inject constructor(
             currentToDoListUIState.copy(
                 notification = null
             )
-        }
-    }
-
-    suspend fun getToDoItemListFlow(): Flow<List<ToDoListItemUIModel>> {
-        return getToDoItemListFlowUseCase.get().map { list ->
-            updateDoneItemsCount(list.count { it.isDone })
-            list.map { toDoItem ->
-                toDoListItemUIMapper.map(toDoItem)
-            }
-        }.combine(_toDoListUIStateMutableStateFlow) { list, toDoListUIState ->
-            if (!toDoListUIState.isDoneItemsVisible) {
-                list.filter { !it.isDone }
-            } else {
-                list
-            }
         }
     }
 
