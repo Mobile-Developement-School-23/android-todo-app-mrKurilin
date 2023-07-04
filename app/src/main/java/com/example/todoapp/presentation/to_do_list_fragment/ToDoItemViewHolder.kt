@@ -111,7 +111,7 @@ class ToDoItemViewHolder(
                 binding.priorityImageView.visibility = View.GONE
             }
 
-            ToDoItemImportance.HIGH -> {
+            ToDoItemImportance.IMPORTANT -> {
                 binding.priorityImageView.visibility = View.VISIBLE
                 binding.priorityImageView.setImageDrawable(highPriorityDrawable)
             }
@@ -120,7 +120,7 @@ class ToDoItemViewHolder(
         if (toDoListItemUIModel.isDone) {
             binding.isDoneCheckbox.buttonTintList = greenColorStateList
             paintFlags = binding.textTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-        } else if (toDoListItemUIModel.priority == ToDoItemImportance.HIGH) {
+        } else if (toDoListItemUIModel.priority == ToDoItemImportance.IMPORTANT) {
             binding.isDoneCheckbox.buttonTintList = redColorStateList
             paintFlags = binding.textTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         } else {
