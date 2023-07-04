@@ -29,39 +29,75 @@
                 android:id="@+id/done_count_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
                 android:layout_gravity="bottom|start"
+                android:layout_marginStart="40dp"
+                android:paddingBottom="6dp"
                 android:text="@string/done_count"
                 android:textColor="#546E7A"
-                android:paddingBottom="6dp"
                 android:textSize="16sp"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.5" />
 
-            <ImageButton
-                android:id="@+id/done_items_visibility_image_view"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_gravity="end|bottom"
-                android:backgroundTint="@android:color/transparent"
-                android:contentDescription="@string/app_name"
-                android:minHeight="48dp"
-                android:paddingBottom="12dp"
-                android:src="@drawable/visibility" />
+                android:animateLayoutChanges="true">
+
+                <ProgressBar
+                    android:id="@+id/data_progress_bar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/offline_warning_image_view"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/baseline_warning_amber_24"
+                    app:tint="@color/yellow" />
+
+                <CheckBox
+                    android:id="@+id/done_items_visibility_checkbox"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:button="@drawable/done_visibility_checkbox"
+                    android:contentDescription="@string/app_name" />
+
+                <ImageButton
+                    android:id="@+id/log_out_image_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/log_out"
+                    android:src="@drawable/baseline_output_24"
+                    app:tint="@color/label_tertiary" />
+
+            </LinearLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/frame"
-        android:padding="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:itemCount="20" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/frame"
+            android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="20" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_action_button"

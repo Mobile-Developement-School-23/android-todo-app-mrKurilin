@@ -45,6 +45,13 @@
                 android:textSize="14sp"
                 tools:ignore="TextContrastCheck" />
 
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:visibility="gone" />
+
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -56,7 +63,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:animateLayoutChanges="true"
             android:padding="16dp">
 
@@ -72,9 +79,8 @@
 
             <EditText
                 android:id="@+id/text_edit_text"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 android:background="@drawable/frame"
                 android:gravity="top"
                 android:hint="@string/what_need_to_do"
@@ -82,6 +88,8 @@
                 android:inputType="textMultiLine"
                 android:minHeight="120dp"
                 android:padding="8dp"
+                android:scrollHorizontally="false"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="VisualLintTextFieldSize" />
@@ -90,8 +98,8 @@
                 android:id="@+id/priority_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/priorities"
                 android:layout_margin="8dp"
+                android:entries="@array/priorities"
                 android:minHeight="48dp"
                 app:layout_constraintBottom_toBottomOf="@id/priority_barrier"
                 app:layout_constraintEnd_toEndOf="parent"

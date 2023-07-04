@@ -1,45 +1,51 @@
 package com.example.todoapp
 
 import android.app.Application
-import android.content.SharedPreferences
-import com.example.todoapp.data.TodoItemsRepository
-import com.example.todoapp.data.local.ToDoItemLocalMapper
-import com.example.todoapp.data.local.ToDoItemsLocalDataSource
-import com.example.todoapp.presentation.to_do_item_entry.model.ToDoItemUIMapper
+import android.provider.Settings
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.todoapp.data.CurrentDeviceId
+import com.example.todoapp.data.LocalListUpdateWorker
+import com.example.todoapp.data.ToDoItemsRepository
+import com.example.todoapp.di.AppComponent
+import com.example.todoapp.di.DaggerAppComponent
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class ToDoApp : Application() {
 
-    private lateinit var sharedPreferences: SharedPreferences
+    @Inject
+    lateinit var todoItemsRepository: ToDoItemsRepository
 
-    private val toDoItemsLocalDataSource by lazy {
-        ToDoItemsLocalDataSource(sharedPreferences)
-    }
-
-    private val todoItemsRepository by lazy {
-        TodoItemsRepository(
-            toDoItemsLocalDataSource,
-            ToDoItemLocalMapper()
-        )
-    }
-
-    private val toDoItemUIMapper by lazy {
-        ToDoItemUIMapper()
-    }
+    lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
 
-        sharedPreferences = getSharedPreferences(
-            "shared preferences",
-            MODE_PRIVATE
+        appComponent = DaggerAppComponent.factory().create(
+            context = this,
+            currentDeviceId = CurrentDeviceId(Settings.Secure.ANDROID_ID)
         )
-    }
+        appComponent.inject(this)
 
-    fun provideTodoItemsRepository(): TodoItemsRepository {
-        return todoItemsRepository
-    }
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
-    fun provideToDoItemUIMapper(): ToDoItemUIMapper {
-        return toDoItemUIMapper
+        val workRequest = PeriodicWorkRequestBuilder<LocalListUpdateWorker>(
+            8,
+            TimeUnit.HOURS,
+            1,
+            TimeUnit.HOURS,
+        ).setConstraints(constraints).build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "LocalListUpdateWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 }

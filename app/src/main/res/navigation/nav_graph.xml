@@ -1,28 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/toDoListFragment">
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/toDoListFragment"
-        android:name="com.example.todoapp.presentation.to_do_list.ToDoListFragment"
+        android:name="com.example.todoapp.presentation.to_do_list_fragment.ToDoListFragment"
         android:label="ToDoListFragment">
         <action
             android:id="@+id/action_toDoListFragment_to_toDoEntryFragment"
-            app:destination="@id/toDoEntryFragment"/>
+            app:destination="@id/toDoItemEntryFragment" />
+        <action
+            android:id="@+id/action_toDoListFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/toDoListFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
-        android:id="@+id/toDoEntryFragment"
-        android:name="com.example.todoapp.presentation.to_do_item_entry.ToDoEntryFragment"
-        android:label="ToDoEntryFragment">
+        android:id="@+id/toDoItemEntryFragment"
+        android:name="com.example.todoapp.presentation.entry_to_do_item_fragment.ToDoItemEntryFragment"
+        android:label="ToDoItemEntryFragment">
         <argument
             android:name="toDoItemId"
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <action
-            android:id="@+id/action_toDoEntryFragment_to_toDoListFragment"
-            app:destination="@id/toDoListFragment" />
+            android:id="@+id/action_toDoItemEntryFragment_to_toDoListFragment"
+            app:destination="@id/toDoListFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.todoapp.presentation.login_fragment.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_toDoListFragment"
+            app:destination="@id/toDoListFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>
