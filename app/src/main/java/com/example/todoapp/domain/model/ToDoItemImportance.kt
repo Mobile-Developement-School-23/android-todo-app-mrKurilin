@@ -24,7 +24,7 @@ enum class ToDoItemImportance(val value: Int) {
                 }
 
                 else -> {
-                    throw IllegalStateException()
+                    error("Illegal string passed")
                 }
             }
         }

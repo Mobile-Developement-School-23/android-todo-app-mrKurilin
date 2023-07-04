@@ -79,9 +79,8 @@
 
             <EditText
                 android:id="@+id/text_edit_text"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 android:background="@drawable/frame"
                 android:gravity="top"
                 android:hint="@string/what_need_to_do"
@@ -89,6 +88,8 @@
                 android:inputType="textMultiLine"
                 android:minHeight="120dp"
                 android:padding="8dp"
+                android:scrollHorizontally="false"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="VisualLintTextFieldSize" />
