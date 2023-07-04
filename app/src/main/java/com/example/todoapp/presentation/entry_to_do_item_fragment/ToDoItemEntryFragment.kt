@@ -9,7 +9,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentEntryToDoItemBinding
 import com.example.todoapp.di.appComponent
@@ -22,8 +21,6 @@ import java.util.Date
 import java.util.Locale
 
 class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
-
-    private val args: ToDoItemEntryFragmentArgs by navArgs()
 
     private val toDoEntryViewModel: ToDoItemEntryViewModel by lazyViewModel {
         appComponent().toDoItemEntryViewModel()
@@ -44,7 +41,7 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        toDoEntryViewModel.loadToDoItem(args.toDoItemId)
+        toDoEntryViewModel.loadToDoItem(arguments?.getString(TO_DO_ITEM_ID_KEY))
 
         binding.closeButton.setOnClickListener {
             findNavController().popBackStack()
@@ -55,11 +52,11 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
         }
 
         binding.saveTextView.setOnClickListener {
-            toDoEntryViewModel.onSavePressed(args.toDoItemId)
+            toDoEntryViewModel.onSavePressed(arguments?.getString(TO_DO_ITEM_ID_KEY))
         }
 
         binding.deleteTextView.setOnClickListener {
-            toDoEntryViewModel.deleteToDoItem(args.toDoItemId)
+            toDoEntryViewModel.deleteToDoItem(arguments?.getString(TO_DO_ITEM_ID_KEY))
         }
 
         binding.deadlineSwitch.setOnClickListener {
@@ -88,7 +85,7 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
                 }
             }
 
-        binding.deleteTextView.isEnabled = args.toDoItemId != null
+        binding.deleteTextView.isEnabled = arguments?.getString(TO_DO_ITEM_ID_KEY) != null
 
         lifecycleScope.launch {
             launch {
@@ -145,5 +142,10 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+
+        const val TO_DO_ITEM_ID_KEY = "TO_DO_ITEM_ID_KEY"
     }
 }
