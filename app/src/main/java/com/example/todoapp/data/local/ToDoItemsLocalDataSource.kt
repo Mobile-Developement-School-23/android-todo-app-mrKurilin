@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.random.Random
 
+const val EXAMPLE_TO_DO_ITEMS_COUNT = 20
+
 class ToDoItemsLocalDataSource @Inject constructor(
     private val toDoItemLocalDao: ToDoItemLocalDao,
 ) {
@@ -32,31 +34,33 @@ class ToDoItemsLocalDataSource @Inject constructor(
 
     suspend fun updateLocalList(remoteList: List<ToDoItemLocal>) {
         val remoteToItemsById = remoteList.associateBy { it.id }
-        val localToItemsWithoutRemoteActionsById = getToDoItemsWithoutRemoteActions().associateBy {
+        val noRemoteActionsToDoItemLocalList = getNoRemoteActionsToDoItemLocalList().associateBy {
             it.id
         }
 
-        localToItemsWithoutRemoteActionsById.keys.subtract(remoteToItemsById.keys).forEach { id ->
+        noRemoteActionsToDoItemLocalList.keys.subtract(remoteToItemsById.keys).forEach { id ->
             toDoItemLocalDao.deleteToDoItemById(id)
         }
 
-        remoteToItemsById.keys.subtract(localToItemsWithoutRemoteActionsById.keys).forEach { id ->
+        remoteToItemsById.keys.subtract(noRemoteActionsToDoItemLocalList.keys).forEach { id ->
             val toDoItemLocal = remoteToItemsById[id]
             if (toDoItemLocal != null) toDoItemLocalDao.insertToDoItemLocal(toDoItemLocal)
         }
 
-        for (id in remoteToItemsById.keys.intersect(localToItemsWithoutRemoteActionsById.keys)) {
-            val toDoItemLocalFromRemote = remoteToItemsById[id] ?: continue
-            val localToDoItemLocal = localToItemsWithoutRemoteActionsById[id] ?: continue
+        for (id in remoteToItemsById.keys.intersect(noRemoteActionsToDoItemLocalList.keys)) {
+            val toDoItemLocalFromRemote = remoteToItemsById[id]
+            val toDoItemLocal = noRemoteActionsToDoItemLocalList[id]
 
-            if (localToDoItemLocal.editDateMillis < toDoItemLocalFromRemote.editDateMillis) {
+            if (toDoItemLocalFromRemote == null || toDoItemLocal == null) {
+                continue
+            } else if (toDoItemLocal.editDateMillis < toDoItemLocalFromRemote.editDateMillis) {
                 toDoItemLocalDao.updateToDoItemLocal(toDoItemLocalFromRemote)
             }
         }
     }
 
-    suspend fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal> {
-        return toDoItemLocalDao.getToDoItemsToUpdateRemote()
+    suspend fun getToDoItemLocalWithRemoteActionList(): List<ToDoItemLocal> {
+        return toDoItemLocalDao.toDoItemLocalWithRemoteActionList()
     }
 
     suspend fun clearList() {
@@ -65,128 +69,27 @@ class ToDoItemsLocalDataSource @Inject constructor(
         }
     }
 
-    private suspend fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal> {
-        return toDoItemLocalDao.getToDoItemsWithoutRemoteActions()
+    private suspend fun getNoRemoteActionsToDoItemLocalList(): List<ToDoItemLocal> {
+        return toDoItemLocalDao.noRemoteActionsToDoItemLocalList()
     }
 
     private suspend fun fillListForExample() {
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Купить что-то",
-                isDone = false,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = 0,
-                deadLineDateMillis = null,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Купить что-то, где-то, зачем-то, но зачем не очень понятно",
-                isDone = false,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = Random.nextInt(0, 2),
-                deadLineDateMillis = null,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обрезается текст при количестве строк более трёх",
-                isDone = false,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = Random.nextInt(0, 2),
-                deadLineDateMillis = null,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Купить что-то с низким приоритетом",
-                isDone = false,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = 0,
-                deadLineDateMillis = null,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Купить что-то с высоким приоритетом",
-                isDone = false,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = 2,
-                deadLineDateMillis = null,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Выполненная задача",
-                isDone = true,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = 1,
-                deadLineDateMillis = null,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Задача с дедлайном",
-                isDone = true,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = 1,
-                deadLineDateMillis = 1686766582536,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        addToDoItem(
-            ToDoItemLocal(
-                id = Random.nextInt().toString(),
-                text = "Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела Огромное количество слов для проверки фрагмента добавления дела ",
-                isDone = false,
-                creationDateMillis = 0,
-                editDateMillis = 0,
-                importance = 1,
-                deadLineDateMillis = 1686766582536,
-                toDoItemAction = ToDoItemAction.ADD,
-            )
-        )
-
-        repeat(10) {
-            addToDoItem(
-                ToDoItemLocal(
-                    id = Random.nextInt().toString(),
-                    text = Random.nextLong().toString(),
-                    isDone = Random.nextBoolean(),
-                    creationDateMillis = 0,
-                    editDateMillis = 0,
-                    importance = Random.nextInt(0, 2),
-                    deadLineDateMillis = Random.nextLong(),
-                    toDoItemAction = ToDoItemAction.ADD,
-                )
-            )
+        repeat(EXAMPLE_TO_DO_ITEMS_COUNT) {
+            addRandomToDoItemLocal()
         }
+    }
+
+    private suspend fun addRandomToDoItemLocal() {
+        addToDoItem(
+            ToDoItemLocal(
+                id = Random.nextInt().toString(),
+                text = Random.nextDouble().toString(),
+                isDone = Random.nextBoolean(),
+                creationDateMillis = Random.nextLong(),
+                importance = Random.nextInt(0, 2),
+                deadLineDateMillis = Random.nextLong(),
+                toDoItemAction = ToDoItemAction.ADD,
+            )
+        )
     }
 }

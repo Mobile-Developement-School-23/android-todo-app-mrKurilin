@@ -42,9 +42,9 @@ class ConnectivityStateObserver @Inject constructor(
     }
 
     private fun isNetworkAvailable(connectivityManager: ConnectivityManager): Boolean {
-        val nw = connectivityManager.activeNetwork ?: return false
-        val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
+        val actNw = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
         return when {
+            actNw == null -> false
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true

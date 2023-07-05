@@ -2,7 +2,7 @@ package com.example.todoapp.presentation.login
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
-import com.example.todoapp.data.local.SharedPreferencesConst.Companion.TOKEN_KEY
+import com.example.todoapp.data.local.TOKEN_KEY
 import com.example.todoapp.domain.usecase.CheckIsAuthorizedUseCase
 import javax.inject.Inject
 

@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.example.todoapp.data.local.ToDoItemsLocalDataSource
 import com.example.todoapp.data.local.mapper.ToDoItemLocalMapper
 import com.example.todoapp.data.local.model.ToDoItemAction
+import com.example.todoapp.data.local.model.ToDoItemLocal
 import com.example.todoapp.data.remote.LAST_KNOWN_REVISION_KEY
 import com.example.todoapp.data.remote.ToDoItemsRemoteDataSource
 import com.example.todoapp.data.remote.mapper.ToDoItemRemoteMapper
@@ -104,60 +105,62 @@ class ToDoItemsRepository @Inject constructor(
 
         applyNewRevision(toDoItemRemoteListResponse.revision)
 
-        try {
+        return try {
             updateRemoteToDoList()
+            Result.success(null)
         } catch (exception: Exception) {
-            return Result.failure(exception)
+            Result.failure(exception)
         }
-
-        return Result.success(null)
     }
 
     private suspend fun updateRemoteToDoList() {
-        toDoItemsLocalDataSource.getToDoItemsToUpdateRemote().forEach { toDoItemLocal ->
-            val toDoItemRemote = toDoItemRemoteMapper.map(toDoItemLocal)
+        val toDoItemsLocalToUpdate = toDoItemsLocalDataSource.getToDoItemLocalWithRemoteActionList()
+        for (toDoItemLocal in toDoItemsLocalToUpdate) {
+            updateRemoteToDoItem(toDoItemLocal)
+        }
+    }
 
-            try {
-                val response = toDoItemsRemoteDataSource.getInundationResponse(
-                    toDoItemRemote,
-                    toDoItemLocal.toDoItemAction!!
-                )
-                applyNewRevision(response.revision)
-            } catch (exception: HttpException) {
-                if (exception.message == "Not Found") {
-                    if (toDoItemLocal.toDoItemAction == ToDoItemAction.DELETE) {
-                        toDoItemsLocalDataSource.deleteToDoItemById(toDoItemLocal.id)
-                    } else if (toDoItemLocal.toDoItemAction == ToDoItemAction.UPDATE) {
-                        toDoItemsLocalDataSource.updateToDoItemLocal(
-                            toDoItemLocal.copy(toDoItemAction = ToDoItemAction.ADD)
-                        )
-                    }
-                }
-            }
+    private suspend fun updateRemoteToDoItem(toDoItemLocal: ToDoItemLocal) {
+        var responseException: Exception? = null
+        try {
+            val response = toDoItemsRemoteDataSource.getInundationResponse(
+                toDoItemRemoteMapper.map(toDoItemLocal),
+                toDoItemLocal.toDoItemAction!!
+            )
+            applyNewRevision(response.revision)
+        } catch (exception: HttpException) {
+            responseException = exception
 
-            if (toDoItemLocal.toDoItemAction != ToDoItemAction.DELETE) {
-                toDoItemsLocalDataSource.updateToDoItemLocal(
-                    toDoItemLocal.copy(toDoItemAction = null)
-                )
-            } else {
-                toDoItemsLocalDataSource.deleteToDoItemById(toDoItemLocal.id)
-            }
+        } finally {
+            updateToDoItemLocalAfterRemoteAction(toDoItemLocal, responseException)
+        }
+    }
+
+    private suspend fun updateToDoItemLocalAfterRemoteAction(
+        toDoItemLocal: ToDoItemLocal,
+        exception: Exception? = null
+    ) {
+        val isToDoItemLocalToUpdate = toDoItemLocal.toDoItemAction == ToDoItemAction.UPDATE
+        if (exception?.message == "Not Found" && isToDoItemLocalToUpdate) {
+            val updatedToDoItemLocal = toDoItemLocal.copy(toDoItemAction = ToDoItemAction.ADD)
+            toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
+            return
+        }
+
+        if (toDoItemLocal.toDoItemAction != ToDoItemAction.DELETE) {
+            val updatedToDoItemLocal = toDoItemLocal.copy(toDoItemAction = null)
+            toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
+        } else {
+            toDoItemsLocalDataSource.deleteToDoItemById(toDoItemLocal.id)
         }
     }
 
     suspend fun clearAll() {
-        try {
-            toDoItemsRemoteDataSource.clearRemoteList()
-        } catch (exception: Exception) {
-            //do nothing
-        }
+        toDoItemsRemoteDataSource.clearRemoteList()
         toDoItemsLocalDataSource.clearList()
     }
 
     private fun applyNewRevision(revision: Int) {
-        sharedPreferences.edit().putInt(
-            LAST_KNOWN_REVISION_KEY,
-            revision
-        ).apply()
+        sharedPreferences.edit().putInt(LAST_KNOWN_REVISION_KEY, revision).apply()
     }
 }

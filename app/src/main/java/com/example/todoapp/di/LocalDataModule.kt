@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import com.example.todoapp.data.local.SharedPreferencesConst.Companion.SHARED_PREF_NAME
+import com.example.todoapp.data.local.SHARED_PREF_NAME
 import com.example.todoapp.data.local.ToDoItemLocalDao
 import com.example.todoapp.data.local.ToDoItemsDatabase
 import dagger.Module

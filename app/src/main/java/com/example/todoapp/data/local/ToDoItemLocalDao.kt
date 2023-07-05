@@ -27,10 +27,10 @@ interface ToDoItemLocalDao {
     suspend fun deleteToDoItemById(toDoItemId: String)
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $TO_DO_ITEM_ACTION_COLUMN_NAME IS NOT NULL")
-    suspend fun getToDoItemsToUpdateRemote(): List<ToDoItemLocal>
+    suspend fun toDoItemLocalWithRemoteActionList(): List<ToDoItemLocal>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE $TO_DO_ITEM_ACTION_COLUMN_NAME IS NULL")
-    suspend fun getToDoItemsWithoutRemoteActions(): List<ToDoItemLocal>
+    suspend fun noRemoteActionsToDoItemLocalList(): List<ToDoItemLocal>
 
     @Query("SELECT $ID_COLUMN_NAME FROM $TABLE_NAME")
     fun getToDoItemIdList(): List<String>

@@ -1,7 +1,8 @@
 package com.example.todoapp.domain.usecase
 
 import android.content.SharedPreferences
-import com.example.todoapp.data.local.SharedPreferencesConst
+import com.example.todoapp.data.local.NOT_AUTHORIZED
+import com.example.todoapp.data.local.TOKEN_KEY
 import javax.inject.Inject
 
 class CheckIsAuthorizedUseCase @Inject constructor(
@@ -9,9 +10,6 @@ class CheckIsAuthorizedUseCase @Inject constructor(
 ) {
 
     fun isAuthorized(): Boolean {
-        return sharedPreferences.getString(
-            SharedPreferencesConst.TOKEN_KEY,
-            SharedPreferencesConst.NOT_AUTHORIZED
-        ) != SharedPreferencesConst.NOT_AUTHORIZED
+        return sharedPreferences.getString(TOKEN_KEY, NOT_AUTHORIZED) != NOT_AUTHORIZED
     }
 }
