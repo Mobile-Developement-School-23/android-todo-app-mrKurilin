@@ -10,14 +10,11 @@ import com.example.todoapp.domain.usecase.SetDoneToDoItemUseCase
 import com.example.todoapp.domain.usecase.UpdateDataUseCase
 import com.example.todoapp.presentation.Notification
 import com.example.todoapp.presentation.todolist.model.ToDoListItemUIMapper
-import com.example.todoapp.presentation.todolist.model.ToDoListItemUIModel
 import com.example.todoapp.presentation.util.ConnectivityStateObserver
 import com.example.todoapp.presentation.util.NetworkConnectivityState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,6 +41,7 @@ class ToDoListViewModel @Inject constructor(
 
     init {
         observeConnectivityState()
+        observeToDoItemList()
     }
 
     fun deleteToDoItem(toDoItemId: String) = viewModelScope.launch {
@@ -68,25 +66,6 @@ class ToDoListViewModel @Inject constructor(
         val currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
         val newToDoListUIState = currentToDoListUIState.copy(
             notification = null
-        )
-        _toDoListUIStateMutableStateFlow.update {
-            newToDoListUIState
-        }
-    }
-
-    suspend fun getToDoItemListFlow(): Flow<List<ToDoListItemUIModel>> {
-        return getToDoItemListFlowUseCase.get().map { list ->
-            updateDoneItemsCount(list.count { it.isDone })
-            list.map { toDoItem -> toDoListItemUIMapper.map(toDoItem) }
-        }.combine(_toDoListUIStateMutableStateFlow) { list, toDoListUIState ->
-            if (!toDoListUIState.isDoneItemsVisible) list.filter { !it.isDone } else list
-        }
-    }
-
-    private fun updateDoneItemsCount(count: Int) {
-        val currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
-        val newToDoListUIState = currentToDoListUIState.copy(
-            doneToDoItemsCount = count
         )
         _toDoListUIStateMutableStateFlow.update {
             newToDoListUIState
@@ -129,6 +108,27 @@ class ToDoListViewModel @Inject constructor(
 
         _toDoListUIStateMutableStateFlow.update {
             currentToDoListUIState.copy(isNoInternetConnection = isNoInternetConnection)
+        }
+    }
+
+    private fun observeToDoItemList() = viewModelScope.launch {
+        _toDoListUIStateMutableStateFlow.combine(
+            getToDoItemListFlowUseCase.get()
+        ) { state, list ->
+            val toDoListItemUIList = list.map { toDoItem -> toDoListItemUIMapper.map(toDoItem) }
+            if (!state.isDoneItemsVisible) {
+                toDoListItemUIList.filter { !it.isDone }
+            } else {
+                toDoListItemUIList
+            }
+        }.collect { toDoListItemUIList ->
+            val doneCount = toDoListItemUIList.count { it.isDone }
+            val currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
+            val updatedToDoListUIState = currentToDoListUIState.copy(
+                doneToDoItemsCount = doneCount,
+                toDoListItemUIModelList = toDoListItemUIList
+            )
+            _toDoListUIStateMutableStateFlow.update { updatedToDoListUIState }
         }
     }
 }

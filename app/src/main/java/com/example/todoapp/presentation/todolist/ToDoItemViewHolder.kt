@@ -75,7 +75,7 @@ class ToDoItemViewHolder(
                 binding.priorityImageView.visibility = View.GONE
             }
 
-            ToDoItemImportance.HIGH -> {
+            ToDoItemImportance.IMPORTANT -> {
                 binding.priorityImageView.visibility = View.VISIBLE
                 val highPriorityDrawable = AppCompatResources.getDrawable(
                     itemView.context,
@@ -90,7 +90,7 @@ class ToDoItemViewHolder(
                 itemView.context, R.color.color_green
             )
             paintFlags = binding.textTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-        } else if (toDoListItemUIModel.priority == ToDoItemImportance.HIGH) {
+        } else if (toDoListItemUIModel.priority == ToDoItemImportance.IMPORTANT) {
             binding.isDoneCheckbox.buttonTintList = ContextCompat.getColorStateList(
                 itemView.context, R.color.color_red
             )

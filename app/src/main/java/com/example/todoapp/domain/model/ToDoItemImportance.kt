@@ -1,7 +1,7 @@
 package com.example.todoapp.domain.model
 
 enum class ToDoItemImportance(val value: Int) {
-    LOW(0), BASIC(1), HIGH(2);
+    LOW(0), BASIC(1), IMPORTANT(2);
 
     companion object {
 
@@ -19,8 +19,8 @@ enum class ToDoItemImportance(val value: Int) {
                     LOW
                 }
 
-                "high" -> {
-                    HIGH
+                "important" -> {
+                    IMPORTANT
                 }
 
                 else -> {

@@ -1,9 +1,11 @@
 package com.example.todoapp.presentation.entrytodoitem
 
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import com.example.todoapp.databinding.FragmentEntryToDoItemBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
 import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIModel
+import com.example.todoapp.presentation.util.hideKeyboard
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -42,6 +45,17 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
         super.onViewCreated(view, savedInstanceState)
 
         toDoEntryViewModel.loadToDoItem(arguments?.getString(TO_DO_ITEM_ID_KEY))
+
+        binding.textEditText.imeOptions = EditorInfo.IME_ACTION_DONE
+        binding.textEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.textEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                hideKeyboard()
+                true
+            } else {
+                false
+            }
+        }
 
         binding.closeButton.setOnClickListener {
             findNavController().popBackStack()

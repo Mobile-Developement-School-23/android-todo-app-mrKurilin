@@ -17,8 +17,8 @@ class ToDoItemRemoteMapper @Inject constructor(
 
     fun map(toDoItemLocal: ToDoItemLocal): ToDoItemRemote {
         val importance = when (ToDoItemImportance.from(toDoItemLocal.importance)) {
-            ToDoItemImportance.HIGH -> {
-                "high"
+            ToDoItemImportance.IMPORTANT -> {
+                "important"
             }
 
             ToDoItemImportance.LOW -> {

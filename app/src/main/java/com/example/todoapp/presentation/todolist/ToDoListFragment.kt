@@ -104,12 +104,6 @@ class ToDoListFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
-                toDoListViewModel.getToDoItemListFlow().collect { toDoItemList ->
-                    adapter.setToDoItems(toDoItemList)
-                }
-            }
-
-            launch {
                 toDoListViewModel.toDoListUIStateStateFlow.collect { toDoListUIState ->
                     updateUI(toDoListUIState)
                 }
@@ -119,6 +113,10 @@ class ToDoListFragment : Fragment() {
 
     private fun updateUI(toDoListUIState: ToDoListUIState) {
         binding.doneItemsVisibilityCheckbox.isChecked = toDoListUIState.isDoneItemsVisible
+
+        (binding.recyclerView.adapter as ToDoItemsAdapter).setToDoItems(
+            toDoListUIState.toDoListItemUIModelList
+        )
 
         binding.doneCountTextView.text = getString(
             R.string.done_count, toDoListUIState.doneToDoItemsCount
