@@ -3,8 +3,8 @@ package com.example.todoapp.data
 import android.content.SharedPreferences
 import com.example.todoapp.data.local.ToDoItemsLocalDataSource
 import com.example.todoapp.data.local.mapper.ToDoItemLocalMapper
-import com.example.todoapp.data.local.model.ToDoItemAction
 import com.example.todoapp.data.local.model.ToDoItemLocal
+import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import com.example.todoapp.data.remote.LAST_KNOWN_REVISION_KEY
 import com.example.todoapp.data.remote.ToDoItemsRemoteDataSource
 import com.example.todoapp.data.remote.mapper.ToDoItemRemoteMapper
@@ -17,6 +17,9 @@ import retrofit2.HttpException
 import java.util.Date
 import javax.inject.Inject
 
+/**
+ * Managing the data operations related to ToDoItems.
+ */
 class ToDoItemsRepository @Inject constructor(
     private val toDoItemsLocalDataSource: ToDoItemsLocalDataSource,
     private val toDoItemsRemoteDataSource: ToDoItemsRemoteDataSource,
@@ -28,22 +31,19 @@ class ToDoItemsRepository @Inject constructor(
     fun getToDoItemListFlow(): Flow<List<ToDoItem>> {
         return toDoItemsLocalDataSource.getToDoItemListFlow().map { list ->
             list.map { toDoItemLocal ->
-                toDoItemLocalMapper.toToDoItem(toDoItemLocal)
+                toDoItemLocalMapper.map(toDoItemLocal)
             }
         }
     }
 
     suspend fun addToDoItem(toDoItem: ToDoItem) {
-        val toDoItemLocal = toDoItemLocalMapper.map(
-            toDoItem = toDoItem,
-            toDoItemAction = ToDoItemAction.ADD
-        )
+        val toDoItemLocal = toDoItemLocalMapper.map(toDoItem)
         toDoItemsLocalDataSource.addToDoItem(toDoItemLocal)
     }
 
     suspend fun deleteToDoItemById(toDoItemId: String) {
         val toDoItemLocal = toDoItemsLocalDataSource.getToDoItemLocal(toDoItemId).copy(
-            toDoItemAction = ToDoItemAction.DELETE
+            toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.DELETE
         )
         toDoItemsLocalDataSource.updateToDoItemLocal(toDoItemLocal)
     }
@@ -54,13 +54,13 @@ class ToDoItemsRepository @Inject constructor(
             toDoItemLocal.copy(
                 isDone = !toDoItemLocal.isDone,
                 editDateMillis = Date().time,
-                toDoItemAction = ToDoItemAction.UPDATE
+                toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.UPDATE
             )
         )
     }
 
     suspend fun getToDoItemById(toDoItemId: String): ToDoItem {
-        return toDoItemLocalMapper.toToDoItem(
+        return toDoItemLocalMapper.map(
             toDoItemsLocalDataSource.getToDoItemLocal(toDoItemId)
         )
     }
@@ -76,7 +76,7 @@ class ToDoItemsRepository @Inject constructor(
             text = text,
             deadLineDateMillis = deadLineDate,
             importance = priority.value,
-            toDoItemAction = ToDoItemAction.UPDATE,
+            toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.UPDATE,
             editDateMillis = Date().time
         )
         toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
@@ -125,7 +125,7 @@ class ToDoItemsRepository @Inject constructor(
         try {
             val response = toDoItemsRemoteDataSource.getInundationResponse(
                 toDoItemRemoteMapper.map(toDoItemLocal),
-                toDoItemLocal.toDoItemAction!!
+                toDoItemLocal.toDoItemLocalRemoteAction!!
             )
             applyNewRevision(response.revision)
         } catch (exception: HttpException) {
@@ -140,15 +140,17 @@ class ToDoItemsRepository @Inject constructor(
         toDoItemLocal: ToDoItemLocal,
         exception: Exception? = null
     ) {
-        val isToDoItemLocalToUpdate = toDoItemLocal.toDoItemAction == ToDoItemAction.UPDATE
+        val isToDoItemLocalToUpdate =
+            toDoItemLocal.toDoItemLocalRemoteAction == ToDoItemLocalRemoteAction.UPDATE
         if (exception?.message == "Not Found" && isToDoItemLocalToUpdate) {
-            val updatedToDoItemLocal = toDoItemLocal.copy(toDoItemAction = ToDoItemAction.ADD)
+            val updatedToDoItemLocal =
+                toDoItemLocal.copy(toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.ADD)
             toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
             return
         }
 
-        if (toDoItemLocal.toDoItemAction != ToDoItemAction.DELETE) {
-            val updatedToDoItemLocal = toDoItemLocal.copy(toDoItemAction = null)
+        if (toDoItemLocal.toDoItemLocalRemoteAction != ToDoItemLocalRemoteAction.DELETE) {
+            val updatedToDoItemLocal = toDoItemLocal.copy(toDoItemLocalRemoteAction = null)
             toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
         } else {
             toDoItemsLocalDataSource.deleteToDoItemById(toDoItemLocal.id)

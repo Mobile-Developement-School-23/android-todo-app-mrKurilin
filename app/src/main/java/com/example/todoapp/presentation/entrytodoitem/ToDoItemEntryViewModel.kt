@@ -17,6 +17,10 @@ import kotlinx.coroutines.runBlocking
 import java.util.Date
 import javax.inject.Inject
 
+/**
+ * Managing the UI state and business logic related to creating and editing ToDoItems in the
+ * presentation layer of the application.
+ */
 class ToDoItemEntryViewModel @Inject constructor(
     private val toDoItemUIMapper: ToDoItemUIMapper,
     private val addToDoItemUseCase: AddToDoItemUseCase,
@@ -70,7 +74,7 @@ class ToDoItemEntryViewModel @Inject constructor(
             }
 
             _toDoItemEntryUIStateMutableStateFlow.update {
-                ToDoItemEntryUIState.CanBeClosed
+                ToDoItemEntryUIState.Closing
             }
         }
     }
@@ -98,7 +102,7 @@ class ToDoItemEntryViewModel @Inject constructor(
                 deleteToDoItemByIdUseCase.delete(toDoItemId)
             }
             _toDoItemEntryUIStateMutableStateFlow.update {
-                ToDoItemEntryUIState.CanBeClosed
+                ToDoItemEntryUIState.Closing
             }
         }
     }

@@ -10,6 +10,9 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
+/**
+ * Managing the dependency graph of the application.
+ */
 @Singleton
 @Component(
     modules = [

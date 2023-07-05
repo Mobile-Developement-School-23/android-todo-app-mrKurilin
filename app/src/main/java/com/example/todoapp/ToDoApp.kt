@@ -18,7 +18,7 @@ const val FLEX_UPDATE_PERIOD_HOURS = 1L
 
 class ToDoApp : Application() {
 
-    lateinit var appComponent: AppComponent
+    private lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
@@ -29,6 +29,10 @@ class ToDoApp : Application() {
         )
 
         enqueueLocalListUpdateWorker()
+    }
+
+    fun provideAppComponent(): AppComponent {
+        return appComponent
     }
 
     private fun enqueueLocalListUpdateWorker() {

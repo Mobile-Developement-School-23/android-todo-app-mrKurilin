@@ -11,6 +11,9 @@ import com.example.todoapp.data.local.model.ToDoItemLocal.Companion.TABLE_NAME
 import com.example.todoapp.data.local.model.ToDoItemLocal.Companion.TO_DO_ITEM_ACTION_COLUMN_NAME
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data Access Object (DAO) for performing database operations on [ToDoItemLocal] in the [ToDoItemLocalDatabase]
+ */
 @Dao
 interface ToDoItemLocalDao {
 

@@ -6,6 +6,10 @@ import androidx.activity.result.contract.ActivityResultContract
 import com.yandex.authsdk.YandexAuthLoginOptions
 import com.yandex.authsdk.YandexAuthSdk
 
+/**
+ * Implementation of the ActivityResultContract interface specifically designed for handling
+ * Yandex sign-in.
+ */
 class YandexSignInActivityResultContract :
     ActivityResultContract<YandexAuthSdk, Pair<Int, Intent?>>() {
 

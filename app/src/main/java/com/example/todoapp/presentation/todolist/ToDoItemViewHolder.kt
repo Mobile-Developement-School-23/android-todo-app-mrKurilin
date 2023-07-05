@@ -1,9 +1,7 @@
 package com.example.todoapp.presentation.todolist
 
 import android.graphics.Paint
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -18,44 +16,6 @@ class ToDoItemViewHolder(
     private val editToDoItem: (Int) -> Unit,
     private val setDoneToDoItem: (Int) -> Unit,
 ) : ViewHolder(binding.root) {
-
-    constructor(
-        parent: ViewGroup,
-        deleteToDoItem: (Int) -> Unit,
-        editToDoItem: (Int) -> Unit,
-        setDoneToDoItem: (Int) -> Unit,
-    ) : this(
-        binding = ToDoItemViewHolderBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        ),
-        deleteToDoItem = deleteToDoItem,
-        editToDoItem = editToDoItem,
-        setDoneToDoItem = setDoneToDoItem,
-    )
-
-    private val greenColorStateList = ContextCompat.getColorStateList(
-        itemView.context, R.color.color_green
-    )
-
-    private val redColorStateList = ContextCompat.getColorStateList(
-        itemView.context, R.color.color_red
-    )
-
-    private val supportSeparatorColorStateList = ContextCompat.getColorStateList(
-        itemView.context, R.color.support_separator
-    )
-
-    private val highPriorityDrawable = AppCompatResources.getDrawable(
-        itemView.context,
-        R.drawable.high_priority
-    )
-
-    private val lowPriorityDrawable = AppCompatResources.getDrawable(
-        itemView.context,
-        R.drawable.low_priority
-    )
 
     init {
         binding.root.isLongClickable = true
@@ -104,6 +64,10 @@ class ToDoItemViewHolder(
         when (toDoListItemUIModel.priority) {
             ToDoItemImportance.LOW -> {
                 binding.priorityImageView.visibility = View.VISIBLE
+                val lowPriorityDrawable = AppCompatResources.getDrawable(
+                    itemView.context,
+                    R.drawable.low_priority
+                )
                 binding.priorityImageView.setImageDrawable(lowPriorityDrawable)
             }
 
@@ -113,18 +77,28 @@ class ToDoItemViewHolder(
 
             ToDoItemImportance.HIGH -> {
                 binding.priorityImageView.visibility = View.VISIBLE
+                val highPriorityDrawable = AppCompatResources.getDrawable(
+                    itemView.context,
+                    R.drawable.high_priority
+                )
                 binding.priorityImageView.setImageDrawable(highPriorityDrawable)
             }
         }
 
         if (toDoListItemUIModel.isDone) {
-            binding.isDoneCheckbox.buttonTintList = greenColorStateList
+            binding.isDoneCheckbox.buttonTintList = ContextCompat.getColorStateList(
+                itemView.context, R.color.color_green
+            )
             paintFlags = binding.textTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
         } else if (toDoListItemUIModel.priority == ToDoItemImportance.HIGH) {
-            binding.isDoneCheckbox.buttonTintList = redColorStateList
+            binding.isDoneCheckbox.buttonTintList = ContextCompat.getColorStateList(
+                itemView.context, R.color.color_red
+            )
             paintFlags = binding.textTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         } else {
-            binding.isDoneCheckbox.buttonTintList = supportSeparatorColorStateList
+            binding.isDoneCheckbox.buttonTintList = ContextCompat.getColorStateList(
+                itemView.context, R.color.support_separator
+            )
             paintFlags = binding.textTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
 

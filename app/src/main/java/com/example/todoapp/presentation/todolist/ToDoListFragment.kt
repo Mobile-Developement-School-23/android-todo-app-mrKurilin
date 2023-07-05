@@ -126,7 +126,7 @@ class ToDoListFragment : Fragment() {
 
         if (toDoListUIState.notification != null) {
             showNotificationSnackBar(toDoListUIState.notification)
-            toDoListViewModel.notifyShown()
+            toDoListViewModel.notificationShown()
         }
 
         binding.logOutImageButton.isVisible = toDoListUIState.isAuthorized

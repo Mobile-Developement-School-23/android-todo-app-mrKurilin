@@ -2,6 +2,17 @@ package com.example.todoapp.presentation.util
 
 import androidx.recyclerview.widget.DiffUtil
 
+/**
+ * A generic implementation of DiffUtil.Callback that calculates the differences between two
+ * lists of items.
+ *
+ * @param <T> The type of items in the lists.
+ *
+ * The differences between the lists are determined based on the provided lambda expressions
+ * for item comparison. By default, it compares items for equality using the '==' operator.
+ * Custom comparison logic can be defined by providing lambdas for item comparison and
+ * content comparison.
+ */
 class GenericDiffUtilCallback<T>(
     private val oldList: List<T>,
     private val newList: List<T>,

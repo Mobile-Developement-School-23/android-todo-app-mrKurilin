@@ -9,6 +9,9 @@ import javax.inject.Inject
 const val RETRY_COUNT = 3
 const val WAIT_BETWEEN_RETRIES = 2000L
 
+/**
+ * Intercepting network requests and implementing retry logic for handling server errors.
+ */
 class RetryInterceptor @Inject constructor() : Interceptor {
 
     var tryCount = 0

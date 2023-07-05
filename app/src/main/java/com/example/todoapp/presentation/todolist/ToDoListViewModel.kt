@@ -22,30 +22,28 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * The [ToDoListViewModel] class is responsible for managing the state and business
+ * logic of the ToDoList feature in the application.
+ */
 class ToDoListViewModel @Inject constructor(
     private val toDoListItemUIMapper: ToDoListItemUIMapper,
     private val getToDoItemListFlowUseCase: GetToDoItemListFlowUseCase,
     private val deleteToDoItemByIdUseCase: DeleteToDoItemByIdUseCase,
     private val setDoneToDoItemUseCase: SetDoneToDoItemUseCase,
     private val updateDataUseCase: UpdateDataUseCase,
-    checkIsAuthorizedUseCase: CheckIsAuthorizedUseCase,
     private val logOutUseCase: LogOutUseCase,
-    private val connectivityStateObserver: ConnectivityStateObserver
+    private val connectivityStateObserver: ConnectivityStateObserver,
+    checkIsAuthorizedUseCase: CheckIsAuthorizedUseCase,
 ) : ViewModel() {
 
     private val _toDoListUIStateMutableStateFlow = MutableStateFlow(
-        ToDoListUIState(
-            isAuthorized = checkIsAuthorizedUseCase.isAuthorized()
-        )
+        ToDoListUIState(isAuthorized = checkIsAuthorizedUseCase.isAuthorized())
     )
     val toDoListUIStateStateFlow = _toDoListUIStateMutableStateFlow.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            connectivityStateObserver.networkConnectivityState.collect { state ->
-                handleNetworkConnectivityState(state)
-            }
-        }
+        observeConnectivityState()
     }
 
     fun deleteToDoItem(toDoItemId: String) = viewModelScope.launch {
@@ -58,96 +56,79 @@ class ToDoListViewModel @Inject constructor(
 
     fun changeDoneItemsVisibility() {
         val currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
+        val newToDoListUIState = currentToDoListUIState.copy(
+            isDoneItemsVisible = !currentToDoListUIState.isDoneItemsVisible
+        )
         _toDoListUIStateMutableStateFlow.update {
-            currentToDoListUIState.copy(
-                isDoneItemsVisible = !currentToDoListUIState.isDoneItemsVisible
-            )
+            newToDoListUIState
         }
     }
 
-    fun notifyShown() {
+    fun notificationShown() {
         val currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
+        val newToDoListUIState = currentToDoListUIState.copy(
+            notification = null
+        )
         _toDoListUIStateMutableStateFlow.update {
-            currentToDoListUIState.copy(
-                notification = null
-            )
+            newToDoListUIState
         }
     }
 
     suspend fun getToDoItemListFlow(): Flow<List<ToDoListItemUIModel>> {
         return getToDoItemListFlowUseCase.get().map { list ->
             updateDoneItemsCount(list.count { it.isDone })
-            list.map { toDoItem ->
-                toDoListItemUIMapper.map(toDoItem)
-            }
+            list.map { toDoItem -> toDoListItemUIMapper.map(toDoItem) }
         }.combine(_toDoListUIStateMutableStateFlow) { list, toDoListUIState ->
-            if (!toDoListUIState.isDoneItemsVisible) {
-                list.filter { !it.isDone }
-            } else {
-                list
-            }
+            if (!toDoListUIState.isDoneItemsVisible) list.filter { !it.isDone } else list
         }
     }
 
     private fun updateDoneItemsCount(count: Int) {
         val currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
+        val newToDoListUIState = currentToDoListUIState.copy(
+            doneToDoItemsCount = count
+        )
         _toDoListUIStateMutableStateFlow.update {
-            currentToDoListUIState.copy(
-                doneToDoItemsCount = count
-            )
+            newToDoListUIState
         }
     }
 
     suspend fun updateData() = viewModelScope.launch {
         var currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
         _toDoListUIStateMutableStateFlow.update {
-            currentToDoListUIState.copy(
-                isUpdatingData = true
-            )
+            currentToDoListUIState.copy(isUpdatingData = true)
         }
 
-        val result = updateDataUseCase.update()
-
-        if (result.isSuccess) {
-            currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
-            _toDoListUIStateMutableStateFlow.update {
-                currentToDoListUIState.copy(
-                    isUpdatingData = false,
-                    notification = Notification.DATA_SYNCHRONIZED
-                )
-            }
+        val notification = if (updateDataUseCase.update().isSuccess) {
+            Notification.DATA_SYNCHRONIZED
         } else {
-            _toDoListUIStateMutableStateFlow.update {
-                currentToDoListUIState.copy(
-                    isUpdatingData = false,
-                    notification = Notification.SYNCHRONIZATION_ERROR
-                )
-            }
+            Notification.SYNCHRONIZATION_ERROR
         }
+        currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
+        val newToDoListUIState = currentToDoListUIState.copy(
+            isUpdatingData = false,
+            notification = notification
+        )
+        _toDoListUIStateMutableStateFlow.update { newToDoListUIState }
+    }
 
+    fun logOut() {
+        logOutUseCase.logOut()
+    }
+
+    private fun observeConnectivityState() = viewModelScope.launch {
+        connectivityStateObserver.networkConnectivityState.collect { state ->
+            handleNetworkConnectivityState(state)
+        }
     }
 
     private fun handleNetworkConnectivityState(state: NetworkConnectivityState) {
         val currentToDoListUIState = _toDoListUIStateMutableStateFlow.value
 
-        val isNoInternetConnection = when (state) {
-            NetworkConnectivityState.AVAILABLE -> {
-                false
-            }
-
-            NetworkConnectivityState.LOST -> {
-                true
-            }
-        }
+        val isNoInternetConnection = state == NetworkConnectivityState.LOST
 
         _toDoListUIStateMutableStateFlow.update {
-            currentToDoListUIState.copy(
-                isNoInternetConnection = isNoInternetConnection
-            )
+            currentToDoListUIState.copy(isNoInternetConnection = isNoInternetConnection)
         }
-    }
-
-    fun logOut() {
-        logOutUseCase.logOut()
     }
 }

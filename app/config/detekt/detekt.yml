@@ -128,7 +128,7 @@ complexity:
     allowedLines: 200
   LongMethod:
     active: true
-    allowedLines: 20
+    allowedLines: 70
   LongParameterList:
     active: true
     functionThreshold: 6

@@ -1,6 +1,6 @@
 package com.example.todoapp.data.local
 
-import com.example.todoapp.data.local.model.ToDoItemAction
+import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import com.example.todoapp.data.local.model.ToDoItemLocal
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -8,6 +8,12 @@ import kotlin.random.Random
 
 const val EXAMPLE_TO_DO_ITEMS_COUNT = 20
 
+/**
+ * Provides access to the local data source for [ToDoItemLocal] and performs operations on the
+ * local database.
+ * Acts as a data source layer between the repository or use case layer and the local database.
+ * Responsible for retrieving, adding, updating, and deleting to-do items in the local database.
+ */
 class ToDoItemsLocalDataSource @Inject constructor(
     private val toDoItemLocalDao: ToDoItemLocalDao,
 ) {
@@ -88,7 +94,7 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 creationDateMillis = Random.nextLong(),
                 importance = Random.nextInt(0, 2),
                 deadLineDateMillis = Random.nextLong(),
-                toDoItemAction = ToDoItemAction.ADD,
+                toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.ADD,
             )
         )
     }

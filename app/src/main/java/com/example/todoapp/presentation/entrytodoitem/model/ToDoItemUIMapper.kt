@@ -5,6 +5,9 @@ import com.example.todoapp.domain.model.ToDoItemImportance
 import java.util.Date
 import javax.inject.Inject
 
+/**
+ * Mapping between [ToDoItem] and [ToDoItemUIModel].
+ */
 class ToDoItemUIMapper @Inject constructor() {
 
     fun map(todoItem: ToDoItem): ToDoItemUIModel {

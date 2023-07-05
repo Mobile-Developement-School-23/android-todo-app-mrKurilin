@@ -13,6 +13,9 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+/**
+ * Defines the API endpoints and corresponding methods for interacting with the remote ToDoAPI.
+ */
 interface ToDoApiService {
 
     @GET("list")

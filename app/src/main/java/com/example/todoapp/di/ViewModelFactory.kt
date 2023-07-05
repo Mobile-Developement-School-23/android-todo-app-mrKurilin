@@ -5,6 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 
+/**
+ * Creating instances of ViewModel classes.
+ */
 class ViewModelFactory<T : ViewModel>(
     savedStateRegistryOwner: SavedStateRegistryOwner,
     private val create: () -> T,

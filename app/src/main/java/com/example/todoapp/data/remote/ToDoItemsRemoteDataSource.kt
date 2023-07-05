@@ -1,7 +1,7 @@
 package com.example.todoapp.data.remote
 
 import android.content.SharedPreferences
-import com.example.todoapp.data.local.model.ToDoItemAction
+import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import com.example.todoapp.data.remote.model.EntryToDoItemRemoteRequest
 import com.example.todoapp.data.remote.model.ToDoItemRemote
 import com.example.todoapp.data.remote.model.ToDoItemRemoteListResponse
@@ -9,6 +9,9 @@ import com.example.todoapp.data.remote.model.ToDoItemRemoteResponse
 import com.example.todoapp.data.remote.model.UpdateToDoItemRemoteListRequest
 import javax.inject.Inject
 
+/**
+ * Handling remote data operations related to ToDoItems.
+ */
 class ToDoItemsRemoteDataSource @Inject constructor(
     private val toDoApiService: ToDoApiService,
     private val sharedPreferences: SharedPreferences,
@@ -27,22 +30,22 @@ class ToDoItemsRemoteDataSource @Inject constructor(
 
     suspend fun getInundationResponse(
         toDoItemRemote: ToDoItemRemote,
-        toDoItemAction: ToDoItemAction
+        toDoItemLocalRemoteAction: ToDoItemLocalRemoteAction
     ): ToDoItemRemoteResponse {
-        return when (toDoItemAction) {
-            ToDoItemAction.UPDATE -> {
+        return when (toDoItemLocalRemoteAction) {
+            ToDoItemLocalRemoteAction.UPDATE -> {
                 updateToDoItemRemote(
                     EntryToDoItemRemoteRequest(toDoItemRemote = toDoItemRemote)
                 )
             }
 
-            ToDoItemAction.DELETE -> {
+            ToDoItemLocalRemoteAction.DELETE -> {
                 deleteToDoItemRemoteById(
                     toDoItemRemote.id
                 )
             }
 
-            ToDoItemAction.ADD -> {
+            ToDoItemLocalRemoteAction.ADD -> {
                 addToDoItemRemote(
                     EntryToDoItemRemoteRequest(toDoItemRemote = toDoItemRemote)
                 )

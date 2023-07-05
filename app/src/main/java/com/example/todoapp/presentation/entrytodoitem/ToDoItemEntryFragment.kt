@@ -98,7 +98,7 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
     private fun updateUI(toDoItemEntryUIState: ToDoItemEntryUIState) {
         when (toDoItemEntryUIState) {
-            ToDoItemEntryUIState.CanBeClosed -> {
+            ToDoItemEntryUIState.Closing -> {
                 findNavController().popBackStack()
             }
 
