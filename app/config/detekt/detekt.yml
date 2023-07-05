@@ -1,11 +1,11 @@
 build:
-maxIssues: 0
-excludeCorrectable: false
-weights:
-# complexity: 2
-# LongParameterList: 1
-# style: 1
-# comments: 1
+  maxIssues: 0
+  excludeCorrectable: false
+  weights:
+  # complexity: 2
+  # LongParameterList: 1
+  # style: 1
+  # comments: 1
 
 config:
   validation: true
@@ -125,14 +125,14 @@ complexity:
     ignoredLabels: []
   LargeClass:
     active: true
-    allowedLines: 600
+    allowedLines: 200
   LongMethod:
     active: true
-    allowedLines: 60
+    allowedLines: 20
   LongParameterList:
     active: true
     functionThreshold: 6
-    constructorThreshold: 7
+    constructorThreshold: 10
     ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
