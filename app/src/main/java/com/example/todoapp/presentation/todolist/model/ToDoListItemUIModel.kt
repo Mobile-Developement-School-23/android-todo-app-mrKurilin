@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list_fragment.model
+package com.example.todoapp.presentation.todolist.model
 
 import com.example.todoapp.domain.model.ToDoItemImportance
 

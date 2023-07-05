@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list_fragment
+package com.example.todoapp.presentation.todolist
 
 import android.graphics.Paint
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.todoapp.R
 import com.example.todoapp.databinding.ToDoItemViewHolderBinding
 import com.example.todoapp.domain.model.ToDoItemImportance
-import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIModel
+import com.example.todoapp.presentation.todolist.model.ToDoListItemUIModel
 
 class ToDoItemViewHolder(
     private val binding: ToDoItemViewHolderBinding,

@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list_fragment
+package com.example.todoapp.presentation.todolist
 
 import com.example.todoapp.presentation.Notification
 

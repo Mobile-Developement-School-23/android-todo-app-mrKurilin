@@ -1,6 +1,6 @@
-package com.example.todoapp.presentation.entry_to_do_item_fragment
+package com.example.todoapp.presentation.entrytodoitem
 
-import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIModel
+import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIModel
 
 sealed class ToDoItemEntryUIState {
 

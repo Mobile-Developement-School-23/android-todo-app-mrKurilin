@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.entry_to_do_item_fragment.model
+package com.example.todoapp.presentation.entrytodoitem.model
 
 data class ToDoItemUIModel(
     val text: String,

@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list_fragment
+package com.example.todoapp.presentation.todolist
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -17,7 +17,8 @@ import com.example.todoapp.databinding.FragmentToDoListBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
 import com.example.todoapp.presentation.Notification
-import com.example.todoapp.presentation.entry_to_do_item_fragment.ToDoItemEntryFragment
+import com.example.todoapp.presentation.UI_DELAY
+import com.example.todoapp.presentation.entrytodoitem.ToDoItemEntryFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -55,7 +56,7 @@ class ToDoListFragment : Fragment() {
             lifecycleScope.launch {
                 runBlocking {
                     toDoListViewModel.updateData()
-                    delay(500)
+                    delay(UI_DELAY)
                 }
             }
         }

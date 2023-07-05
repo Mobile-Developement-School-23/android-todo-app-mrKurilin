@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list_fragment
+package com.example.todoapp.presentation.todolist
 
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
-import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIModel
+import com.example.todoapp.presentation.todolist.model.ToDoListItemUIModel
 import com.example.todoapp.presentation.util.GenericDiffUtilCallback
 import com.example.todoapp.presentation.util.ToDoItemSwipeGesture
 

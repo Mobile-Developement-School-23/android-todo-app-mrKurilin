@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.entry_to_do_item_fragment
+package com.example.todoapp.presentation.entrytodoitem
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentEntryToDoItemBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
-import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIModel
+import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar

@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list_fragment
+package com.example.todoapp.presentation.todolist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,8 +9,8 @@ import com.example.todoapp.domain.usecase.LogOutUseCase
 import com.example.todoapp.domain.usecase.SetDoneToDoItemUseCase
 import com.example.todoapp.domain.usecase.UpdateDataUseCase
 import com.example.todoapp.presentation.Notification
-import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIMapper
-import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIModel
+import com.example.todoapp.presentation.todolist.model.ToDoListItemUIMapper
+import com.example.todoapp.presentation.todolist.model.ToDoListItemUIModel
 import com.example.todoapp.presentation.util.ConnectivityStateObserver
 import com.example.todoapp.presentation.util.NetworkConnectivityState
 import kotlinx.coroutines.flow.Flow

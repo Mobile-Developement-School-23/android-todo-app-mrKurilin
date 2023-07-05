@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.entry_to_do_item_fragment
+package com.example.todoapp.presentation.entrytodoitem
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,8 +7,8 @@ import com.example.todoapp.domain.usecase.AddToDoItemUseCase
 import com.example.todoapp.domain.usecase.DeleteToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.GetToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.UpdateToDoItemUseCase
-import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIMapper
-import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIModel
+import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIMapper
+import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

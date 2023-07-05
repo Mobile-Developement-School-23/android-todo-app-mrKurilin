@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.login_fragment
+package com.example.todoapp.presentation.login
 
 import android.content.Context
 import android.content.Intent
