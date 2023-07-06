@@ -1,10 +1,10 @@
 package com.example.todoapp.presentation.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -12,6 +12,7 @@ import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentLoginBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
+import com.example.todoapp.presentation.util.showLongToast
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
@@ -40,29 +41,24 @@ class LoginFragment : Fragment() {
         sdk = YandexAuthSdk(requireContext(), YandexAuthOptions(requireContext()))
 
         launcher = registerForActivityResult(YandexSignInActivityResultContract()) { pair ->
-            try {
-                val token = sdk.extractToken(pair.first, pair.second)
-                if (token != null) {
-                    loginViewModel.putToken(token.value)
-                    findNavController().navigate(R.id.action_loginFragment_to_toDoListFragment)
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        getText(R.string.failed_to_login),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            } catch (yandexAuthException: YandexAuthException) {
-                Toast.makeText(
-                    requireContext(),
-                    getText(R.string.failed_to_login),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            if (pair == null) return@registerForActivityResult
+            handleYandexSignInActivityResult(pair)
         }
 
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    private fun handleYandexSignInActivityResult(pair: Pair<Int, Intent?>) = try {
+        val token = sdk.extractToken(pair.first, pair.second)
+        if (token != null) {
+            loginViewModel.putToken(token.value)
+            findNavController().navigate(R.id.action_loginFragment_to_toDoListFragment)
+        } else {
+            showLongToast(R.string.failed_to_login)
+        }
+    } catch (yandexAuthException: YandexAuthException) {
+        showLongToast(R.string.failed_to_login)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -102,10 +102,8 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
         binding.deleteTextView.isEnabled = arguments?.getString(TO_DO_ITEM_ID_KEY) != null
 
         lifecycleScope.launch {
-            launch {
-                toDoEntryViewModel.toDoItemEntryUIStateMutableStateFlow.collect { toDoItemEntryUIState ->
-                    updateUI(toDoItemEntryUIState)
-                }
+            toDoEntryViewModel.toDoItemEntryUIStateMutableStateFlow.collect { toDoItemEntryUIState ->
+                updateUI(toDoItemEntryUIState)
             }
         }
     }
@@ -125,6 +123,11 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
                 binding.saveTextView.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
                 bindToDoItemUIModel(toDoItemEntryUIState.toDoItemUIModel)
+            }
+
+            ToDoItemEntryUIState.ShowInit -> {
+                binding.saveTextView.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
             }
         }
     }

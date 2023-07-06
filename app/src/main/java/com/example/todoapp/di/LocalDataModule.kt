@@ -21,10 +21,7 @@ interface LocalDataModule {
 
         @Provides
         fun provideSharedPreferences(context: Context): SharedPreferences {
-            return context.getSharedPreferences(
-                SHARED_PREF_NAME,
-                Application.MODE_PRIVATE
-            )
+            return context.getSharedPreferences(SHARED_PREF_NAME, Application.MODE_PRIVATE)
         }
 
         @Singleton

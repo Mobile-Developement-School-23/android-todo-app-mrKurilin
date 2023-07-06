@@ -9,23 +9,21 @@ enum class ToDoItemImportance(val value: Int) {
             return ToDoItemImportance.values().firstOrNull { it.value == value }!!
         }
 
-        fun fromString(value: String): ToDoItemImportance {
-            return when (value) {
-                "basic" -> {
-                    BASIC
-                }
+        fun fromString(value: String): ToDoItemImportance = when (value) {
+            "basic" -> {
+                BASIC
+            }
 
-                "low" -> {
-                    LOW
-                }
+            "low" -> {
+                LOW
+            }
 
-                "important" -> {
-                    IMPORTANT
-                }
+            "important" -> {
+                IMPORTANT
+            }
 
-                else -> {
-                    error("Passed illegal value")
-                }
+            else -> {
+                error("Passed illegal value")
             }
         }
     }

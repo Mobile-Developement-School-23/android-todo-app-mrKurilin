@@ -1,6 +1,7 @@
 package com.example.todoapp.presentation.todolist
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +23,6 @@ import com.example.todoapp.presentation.entrytodoitem.ToDoItemEntryFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ToDoListFragment : Fragment() {
 
@@ -54,10 +54,8 @@ class ToDoListFragment : Fragment() {
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             lifecycleScope.launch {
-                runBlocking {
-                    toDoListViewModel.updateData()
-                    delay(UI_DELAY)
-                }
+                delay(UI_DELAY)
+                toDoListViewModel.updateData()
             }
         }
 
@@ -103,10 +101,8 @@ class ToDoListFragment : Fragment() {
         )
 
         viewLifecycleOwner.lifecycleScope.launch {
-            launch {
-                toDoListViewModel.toDoListUIStateStateFlow.collect { toDoListUIState ->
-                    updateUI(toDoListUIState)
-                }
+            toDoListViewModel.toDoListUIStateStateFlow.collect { toDoListUIState ->
+                updateUI(toDoListUIState)
             }
         }
     }
@@ -129,40 +125,46 @@ class ToDoListFragment : Fragment() {
 
         binding.logOutImageButton.isVisible = toDoListUIState.isAuthorized
 
-        binding.offlineWarningImageView.isVisible =
-            toDoListUIState.isNoInternetConnection || !toDoListUIState.isAuthorized
+        if (toDoListUIState.isNoInternetConnection || !toDoListUIState.isAuthorized) {
+            binding.syncWarningImageView.isVisible = true
+            bindSyncWarning(toDoListUIState)
+        } else {
+            binding.syncWarningImageView.isVisible = false
+        }
+    }
+
+    private fun bindSyncWarning(toDoListUIState: ToDoListUIState) {
+        val title: String
+        val message: String
+        val positiveButtonListener: DialogInterface.OnClickListener?
 
         if (!toDoListUIState.isAuthorized) {
-            binding.offlineWarningImageView.setOnClickListener {
-                AlertDialog.Builder(requireContext())
-                    .setTitle(getString(R.string.not_authorized))
-                    .setMessage(getString(R.string.cant_sync_without_auth))
-                    .setPositiveButton(getString(R.string.login_with_yandex_id)) { _, _ ->
-                        findNavController().navigate(R.id.loginFragment)
-                    }
-                    .show()
+            title = getString(R.string.not_authorized)
+            message = getString(R.string.cant_sync_without_auth)
+            positiveButtonListener = DialogInterface.OnClickListener { _, _ ->
+                findNavController().navigate(R.id.loginFragment)
             }
-        } else if (toDoListUIState.isNoInternetConnection) {
-            binding.offlineWarningImageView.setOnClickListener {
-                AlertDialog.Builder(requireContext())
-                    .setTitle(getString(R.string.no_network))
-                    .setMessage(getString(R.string.cant_sync_without_network))
-                    .setPositiveButton(getString(R.string.it_is_clear), null)
-                    .show()
-            }
+        } else {
+            title = getString(R.string.no_network)
+            message = getString(R.string.cant_sync_without_auth)
+            positiveButtonListener = null
+        }
+
+        binding.syncWarningImageView.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(getString(R.string.it_is_clear), positiveButtonListener)
+                .show()
         }
     }
 
     private fun showNotificationSnackBar(notification: Notification) {
         binding.swipeRefreshLayout.isRefreshing = false
-        val stringId = when (notification) {
-            Notification.DATA_SYNCHRONIZED -> {
-                R.string.data_synchronized
-            }
-
-            Notification.SYNCHRONIZATION_ERROR -> {
-                R.string.synchronization_error
-            }
+        val stringId = if (notification == Notification.DATA_SYNCHRONIZED) {
+            R.string.data_synchronized
+        } else {
+            R.string.synchronization_error
         }
 
         Snackbar.make(

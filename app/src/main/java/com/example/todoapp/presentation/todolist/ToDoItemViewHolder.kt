@@ -1,14 +1,15 @@
 package com.example.todoapp.presentation.todolist
 
+import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.view.View
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.todoapp.R
 import com.example.todoapp.databinding.ToDoItemViewHolderBinding
 import com.example.todoapp.domain.model.ToDoItemImportance
 import com.example.todoapp.presentation.todolist.model.ToDoListItemUIModel
+import com.example.todoapp.presentation.util.getColorStateList
+import com.example.todoapp.presentation.util.getDrawable
 
 class ToDoItemViewHolder(
     private val binding: ToDoItemViewHolderBinding,
@@ -59,50 +60,44 @@ class ToDoItemViewHolder(
             binding.dateTextView.visibility = View.GONE
         }
 
+        setImportanceIcon(toDoListItemUIModel.importance)
+        setTextPaintFlags(toDoListItemUIModel)
+    }
+
+    private fun setTextPaintFlags(toDoListItemUIModel: ToDoListItemUIModel) {
         val paintFlags: Int
-
-        when (toDoListItemUIModel.priority) {
-            ToDoItemImportance.LOW -> {
-                binding.priorityImageView.visibility = View.VISIBLE
-                val lowPriorityDrawable = AppCompatResources.getDrawable(
-                    itemView.context,
-                    R.drawable.low_priority
-                )
-                binding.priorityImageView.setImageDrawable(lowPriorityDrawable)
-            }
-
-            ToDoItemImportance.BASIC -> {
-                binding.priorityImageView.visibility = View.GONE
-            }
-
-            ToDoItemImportance.IMPORTANT -> {
-                binding.priorityImageView.visibility = View.VISIBLE
-                val highPriorityDrawable = AppCompatResources.getDrawable(
-                    itemView.context,
-                    R.drawable.high_priority
-                )
-                binding.priorityImageView.setImageDrawable(highPriorityDrawable)
-            }
-        }
+        val colorStateList: ColorStateList?
 
         if (toDoListItemUIModel.isDone) {
-            binding.isDoneCheckbox.buttonTintList = ContextCompat.getColorStateList(
-                itemView.context, R.color.color_green
-            )
+            colorStateList = getColorStateList(R.color.color_green)
             paintFlags = binding.textTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-        } else if (toDoListItemUIModel.priority == ToDoItemImportance.IMPORTANT) {
-            binding.isDoneCheckbox.buttonTintList = ContextCompat.getColorStateList(
-                itemView.context, R.color.color_red
-            )
+        } else if (toDoListItemUIModel.importance == ToDoItemImportance.IMPORTANT) {
+            colorStateList = getColorStateList(R.color.color_red)
             paintFlags = binding.textTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         } else {
-            binding.isDoneCheckbox.buttonTintList = ContextCompat.getColorStateList(
-                itemView.context, R.color.support_separator
-            )
+            colorStateList = getColorStateList(R.color.support_separator)
             paintFlags = binding.textTextView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
         }
-
+        binding.isDoneCheckbox.buttonTintList = colorStateList
         binding.textTextView.paintFlags = paintFlags
+    }
+
+    private fun setImportanceIcon(importance: ToDoItemImportance) = when (importance) {
+        ToDoItemImportance.LOW -> {
+            binding.priorityImageView.visibility = View.VISIBLE
+            val lowPriorityDrawable = getDrawable(R.drawable.low_priority)
+            binding.priorityImageView.setImageDrawable(lowPriorityDrawable)
+        }
+
+        ToDoItemImportance.BASIC -> {
+            binding.priorityImageView.visibility = View.GONE
+        }
+
+        ToDoItemImportance.IMPORTANT -> {
+            binding.priorityImageView.visibility = View.VISIBLE
+            val highPriorityDrawable = getDrawable(R.drawable.high_priority)
+            binding.priorityImageView.setImageDrawable(highPriorityDrawable)
+        }
     }
 
     fun isDone(): Boolean {

@@ -9,6 +9,6 @@ data class ToDoListItemUIModel(
     val id: String,
     val text: String,
     val isDone: Boolean,
-    val priority: ToDoItemImportance,
+    val importance: ToDoItemImportance,
     val deadLineDate: String?,
 )

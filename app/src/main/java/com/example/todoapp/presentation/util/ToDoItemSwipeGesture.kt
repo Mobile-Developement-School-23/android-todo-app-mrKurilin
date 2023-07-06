@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -20,10 +21,9 @@ const val SWIPE_VELOCITY_COEFFICIENT = 5
  * Displays delete and done icons during swipe actions and provides the necessary logic to draw
  * the icons and background colors based on the swipe direction and item status.
  */
-abstract class ToDoItemSwipeGesture(
-    private val deleteIcon: Drawable,
-    private val doneIcon: Drawable,
-    private val unDoneIcon: Drawable,
+class ToDoItemSwipeGesture(
+    private val deleteToDoItem: (Int) -> Unit,
+    private val setDoneToDoItem: (Int) -> Unit,
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
     private val background = ColorDrawable()
@@ -54,13 +54,17 @@ abstract class ToDoItemSwipeGesture(
             val isDone = viewHolder is ToDoItemViewHolder && viewHolder.isDone()
             drawDoneIcon(canvas, viewHolder.itemView, dX, isDone, recyclerView)
         } else {
-            drawDeleteIcon(canvas, viewHolder.itemView, dX)
+            val deleteIcon = ContextCompat.getDrawable(
+                recyclerView.context,
+                R.drawable.delete,
+            )!!
+            drawDeleteIcon(canvas, viewHolder.itemView, dX, deleteIcon)
         }
 
         super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
-    private fun drawDeleteIcon(canvas: Canvas, itemView: View, dX: Float) {
+    private fun drawDeleteIcon(canvas: Canvas, itemView: View, dX: Float, deleteIcon: Drawable) {
         val intrinsicWidth = deleteIcon.intrinsicWidth
         val intrinsicHeight = deleteIcon.intrinsicHeight
         val backgroundColor = Color.parseColor("#f44336")
@@ -89,15 +93,15 @@ abstract class ToDoItemSwipeGesture(
         isDone: Boolean,
         recyclerView: RecyclerView
     ) {
-        val icon = if (isDone) unDoneIcon else doneIcon
+        val icon = if (isDone) {
+            AppCompatResources.getDrawable(recyclerView.context, R.drawable.empty_square)!!
+        } else {
+            ContextCompat.getDrawable(recyclerView.context, R.drawable.check)!!
+        }
 
         background.color = ContextCompat.getColor(recyclerView.context, R.color.color_green)
-        background.setBounds(
-            itemView.left,
-            itemView.top,
-            dX.toInt() + BACKGROUND_MARGIN,
-            itemView.bottom
-        )
+        val rightBound = dX.toInt() + BACKGROUND_MARGIN
+        background.setBounds(itemView.left, itemView.top, rightBound, itemView.bottom)
         background.draw(canvas)
 
         val doneIconTop = itemView.top + (itemView.height - icon.intrinsicHeight) / 2
@@ -111,5 +115,19 @@ abstract class ToDoItemSwipeGesture(
 
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
         return defaultValue * SWIPE_VELOCITY_COEFFICIENT
+    }
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = when (direction) {
+        ItemTouchHelper.LEFT -> {
+            deleteToDoItem(viewHolder.adapterPosition)
+        }
+
+        ItemTouchHelper.RIGHT -> {
+            setDoneToDoItem(viewHolder.adapterPosition)
+        }
+
+        else -> {
+            //do nothing
+        }
     }
 }

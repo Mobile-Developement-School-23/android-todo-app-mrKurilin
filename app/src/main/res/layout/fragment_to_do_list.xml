@@ -51,7 +51,7 @@
                     android:visibility="gone" />
 
                 <ImageButton
-                    android:id="@+id/offline_warning_image_view"
+                    android:id="@+id/sync_warning_image_view"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:backgroundTint="@android:color/transparent"

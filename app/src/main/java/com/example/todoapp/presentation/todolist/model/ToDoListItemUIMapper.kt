@@ -20,7 +20,7 @@ class ToDoListItemUIMapper @Inject constructor() {
             id = todoItem.id,
             text = todoItem.text,
             isDone = todoItem.isDone,
-            priority = todoItem.priority,
+            importance = todoItem.priority,
             deadLineDate = deadLineDate,
         )
     }

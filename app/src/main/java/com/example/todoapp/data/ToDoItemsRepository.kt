@@ -30,9 +30,7 @@ class ToDoItemsRepository @Inject constructor(
 
     fun getToDoItemListFlow(): Flow<List<ToDoItem>> {
         return toDoItemsLocalDataSource.getToDoItemListFlow().map { list ->
-            list.map { toDoItemLocal ->
-                toDoItemLocalMapper.map(toDoItemLocal)
-            }
+            list.map { toDoItemLocal -> toDoItemLocalMapper.map(toDoItemLocal) }
         }
     }
 
@@ -50,13 +48,12 @@ class ToDoItemsRepository @Inject constructor(
 
     suspend fun setDoneToDoItem(toDoItemId: String) {
         val toDoItemLocal = toDoItemsLocalDataSource.getToDoItemLocal(toDoItemId)
-        toDoItemsLocalDataSource.updateToDoItemLocal(
-            toDoItemLocal.copy(
-                isDone = !toDoItemLocal.isDone,
-                editDateMillis = Date().time,
-                toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.UPDATE
-            )
+        val updatedToDoItemLocal = toDoItemLocal.copy(
+            isDone = !toDoItemLocal.isDone,
+            editDateMillis = Date().time,
+            toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.UPDATE
         )
+        toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
     }
 
     suspend fun getToDoItemById(toDoItemId: String): ToDoItem {
@@ -130,7 +127,6 @@ class ToDoItemsRepository @Inject constructor(
             applyNewRevision(response.revision)
         } catch (exception: HttpException) {
             responseException = exception
-
         } finally {
             updateToDoItemLocalAfterRemoteAction(toDoItemLocal, responseException)
         }
