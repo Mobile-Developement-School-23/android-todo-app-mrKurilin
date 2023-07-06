@@ -2,25 +2,31 @@ package com.example.todoapp.presentation.util
 
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
-import com.example.todoapp.presentation.to_do_list_fragment.ToDoItemViewHolder
+import com.example.todoapp.presentation.todolist.ToDoItemViewHolder
 
+const val ICON_MARGIN = 50
+const val BACKGROUND_MARGIN = 10
+const val SWIPE_VELOCITY_COEFFICIENT = 5
+
+/**
+ * Handles the swipe gestures in a RecyclerView for ToDoItems.
+ * Displays delete and done icons during swipe actions and provides the necessary logic to draw
+ * the icons and background colors based on the swipe direction and item status.
+ */
 abstract class ToDoItemSwipeGesture(
     private val deleteIcon: Drawable,
     private val doneIcon: Drawable,
     private val unDoneIcon: Drawable,
-) : ItemTouchHelper.SimpleCallback(
-    0,
-    ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-) {
+) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+
+    private val background = ColorDrawable()
 
     override fun onMove(
         recyclerView: RecyclerView,
@@ -31,7 +37,7 @@ abstract class ToDoItemSwipeGesture(
     }
 
     override fun onChildDraw(
-        c: Canvas,
+        canvas: Canvas,
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         dX: Float,
@@ -39,81 +45,71 @@ abstract class ToDoItemSwipeGesture(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        val background = ColorDrawable()
-        val itemView = viewHolder.itemView
-        val itemHeight = itemView.bottom - itemView.top
-        val isCanceled = dX == 0f && !isCurrentlyActive
-
-        if (isCanceled) {
-            clearCanvas(
-                c,
-                itemView.right + dX,
-                itemView.top.toFloat(),
-                itemView.right.toFloat(),
-                itemView.bottom.toFloat()
-            )
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        if (dX == 0f && !isCurrentlyActive) {
+            super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, false)
             return
         }
 
         if (dX > 0) {
-            val icon = if (viewHolder is ToDoItemViewHolder && viewHolder.isDone()) {
-                unDoneIcon
-            } else {
-                doneIcon
-            }
-
-            val intrinsicWidth = icon.intrinsicWidth
-            val intrinsicHeight = icon.intrinsicHeight
-
-            val backgroundColor = ContextCompat.getColor(
-                recyclerView.context,
-                R.color.color_green
-            )
-
-            background.color = backgroundColor
-            background.setBounds(itemView.left, itemView.top, dX.toInt() + 10, itemView.bottom)
-            background.draw(c)
-
-            val doneIconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
-            val doneIconBottom = doneIconTop + intrinsicHeight
-            val doneIconRight = dX.toInt() - 50
-            val doneIconLeft = doneIconRight - intrinsicWidth
-
-            icon.setBounds(doneIconLeft, doneIconTop, doneIconRight, doneIconBottom)
-            icon.draw(c)
+            val isDone = viewHolder is ToDoItemViewHolder && viewHolder.isDone()
+            drawDoneIcon(canvas, viewHolder.itemView, dX, isDone, recyclerView)
         } else {
-            val intrinsicWidth = deleteIcon.intrinsicWidth
-            val intrinsicHeight = deleteIcon.intrinsicHeight
-            // Draw the delete background
-            val backgroundColor = Color.parseColor("#f44336")
-            background.color = backgroundColor
-            background.setBounds(
-                itemView.right + dX.toInt(),
-                itemView.top,
-                itemView.right,
-                itemView.bottom
-            )
-            background.draw(c)
-
-            val deleteIconTop = itemView.top + (itemHeight - intrinsicHeight) / 2
-            val deleteIconBottom = deleteIconTop + intrinsicHeight
-            val deleteIconLeft = dX.toInt() + itemView.width + 50
-            val deleteIconRight = deleteIconLeft + intrinsicWidth
-
-            deleteIcon.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
-            deleteIcon.draw(c)
+            drawDeleteIcon(canvas, viewHolder.itemView, dX)
         }
 
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        super.onChildDraw(canvas, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
-    private fun clearCanvas(c: Canvas?, left: Float, top: Float, right: Float, bottom: Float) {
-        val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
-        c?.drawRect(left, top, right, bottom, clearPaint)
+    private fun drawDeleteIcon(canvas: Canvas, itemView: View, dX: Float) {
+        val intrinsicWidth = deleteIcon.intrinsicWidth
+        val intrinsicHeight = deleteIcon.intrinsicHeight
+        val backgroundColor = Color.parseColor("#f44336")
+        background.color = backgroundColor
+        background.setBounds(
+            itemView.right + dX.toInt(),
+            itemView.top,
+            itemView.right,
+            itemView.bottom
+        )
+        background.draw(canvas)
+
+        val deleteIconTop = itemView.top + (itemView.height - intrinsicHeight) / 2
+        val deleteIconBottom = deleteIconTop + intrinsicHeight
+        val deleteIconLeft = dX.toInt() + itemView.width + ICON_MARGIN
+        val deleteIconRight = deleteIconLeft + intrinsicWidth
+
+        deleteIcon.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
+        deleteIcon.draw(canvas)
+    }
+
+    private fun drawDoneIcon(
+        canvas: Canvas,
+        itemView: View,
+        dX: Float,
+        isDone: Boolean,
+        recyclerView: RecyclerView
+    ) {
+        val icon = if (isDone) unDoneIcon else doneIcon
+
+        background.color = ContextCompat.getColor(recyclerView.context, R.color.color_green)
+        background.setBounds(
+            itemView.left,
+            itemView.top,
+            dX.toInt() + BACKGROUND_MARGIN,
+            itemView.bottom
+        )
+        background.draw(canvas)
+
+        val doneIconTop = itemView.top + (itemView.height - icon.intrinsicHeight) / 2
+        val doneIconBottom = doneIconTop + icon.intrinsicHeight
+        val doneIconRight = dX.toInt() - ICON_MARGIN
+        val doneIconLeft = doneIconRight - icon.intrinsicWidth
+
+        icon.setBounds(doneIconLeft, doneIconTop, doneIconRight, doneIconBottom)
+        icon.draw(canvas)
     }
 
     override fun getSwipeEscapeVelocity(defaultValue: Float): Float {
-        return defaultValue * 5
+        return defaultValue * SWIPE_VELOCITY_COEFFICIENT
     }
 }

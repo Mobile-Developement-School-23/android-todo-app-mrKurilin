@@ -1,10 +1,13 @@
-package com.example.todoapp.presentation.to_do_list_fragment.model
+package com.example.todoapp.presentation.todolist.model
 
 import com.example.todoapp.domain.model.ToDoItem
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * Responsible for mapping a domain-level ToDoItem object to a UI-specific ToDoListItemUIModel.
+ */
 class ToDoListItemUIMapper @Inject constructor() {
 
     fun map(todoItem: ToDoItem): ToDoListItemUIModel {

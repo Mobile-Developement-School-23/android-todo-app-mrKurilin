@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.todoapp.ToDoApp
 
 fun Fragment.appComponent(): AppComponent {
-    return (requireActivity().application as ToDoApp).appComponent
+    return (requireActivity().application as ToDoApp).provideAppComponent()
 }
 
 inline fun <reified T : ViewModel> Fragment.lazyViewModel(

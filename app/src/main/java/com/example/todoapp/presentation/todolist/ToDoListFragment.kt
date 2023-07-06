@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.to_do_list_fragment
+package com.example.todoapp.presentation.todolist
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,8 @@ import com.example.todoapp.databinding.FragmentToDoListBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
 import com.example.todoapp.presentation.Notification
+import com.example.todoapp.presentation.UI_DELAY
+import com.example.todoapp.presentation.entrytodoitem.ToDoItemEntryFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,7 +56,7 @@ class ToDoListFragment : Fragment() {
             lifecycleScope.launch {
                 runBlocking {
                     toDoListViewModel.updateData()
-                    delay(500)
+                    delay(UI_DELAY)
                 }
             }
         }
@@ -68,18 +71,14 @@ class ToDoListFragment : Fragment() {
                 .setMessage(getString(R.string.sure_to_log_out))
                 .setPositiveButton(getString(R.string.yes)) { _, _ ->
                     toDoListViewModel.logOut()
-                    findNavController().navigate(
-                        ToDoListFragmentDirections.actionToDoListFragmentToLoginFragment()
-                    )
+                    findNavController().navigate(R.id.loginFragment)
                 }
                 .setNegativeButton(getString(R.string.no), null)
                 .show()
         }
 
         binding.floatingActionButton.setOnClickListener {
-            findNavController().navigate(
-                ToDoListFragmentDirections.actionToDoListFragmentToToDoEntryFragment()
-            )
+            findNavController().navigate(R.id.toDoItemEntryFragment)
         }
 
         val adapter = ToDoItemsAdapter(
@@ -90,9 +89,8 @@ class ToDoListFragment : Fragment() {
                 toDoListViewModel.setDoneToDoItem(toDoItemId)
             },
             editToDoItem = { toDoItemId ->
-                findNavController().navigate(
-                    ToDoListFragmentDirections.actionToDoListFragmentToToDoEntryFragment()
-                )
+                val bundle = bundleOf(ToDoItemEntryFragment.TO_DO_ITEM_ID_KEY to toDoItemId)
+                findNavController().navigate(R.id.toDoItemEntryFragment, bundle)
             }
         )
 
@@ -126,7 +124,7 @@ class ToDoListFragment : Fragment() {
 
         if (toDoListUIState.notification != null) {
             showNotificationSnackBar(toDoListUIState.notification)
-            toDoListViewModel.notifyShown()
+            toDoListViewModel.notificationShown()
         }
 
         binding.logOutImageButton.isVisible = toDoListUIState.isAuthorized
@@ -140,9 +138,7 @@ class ToDoListFragment : Fragment() {
                     .setTitle(getString(R.string.not_authorized))
                     .setMessage(getString(R.string.cant_sync_without_auth))
                     .setPositiveButton(getString(R.string.login_with_yandex_id)) { _, _ ->
-                        findNavController().navigate(
-                            ToDoListFragmentDirections.actionToDoListFragmentToLoginFragment()
-                        )
+                        findNavController().navigate(R.id.loginFragment)
                     }
                     .show()
             }

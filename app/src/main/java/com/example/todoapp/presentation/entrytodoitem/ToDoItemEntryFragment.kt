@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.entry_to_do_item_fragment
+package com.example.todoapp.presentation.entrytodoitem
 
 import android.os.Bundle
 import android.text.InputType
@@ -11,12 +11,11 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentEntryToDoItemBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
-import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIModel
+import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIModel
 import com.example.todoapp.presentation.util.hideKeyboard
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -25,8 +24,6 @@ import java.util.Date
 import java.util.Locale
 
 class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
-
-    private val args: ToDoItemEntryFragmentArgs by navArgs()
 
     private val toDoEntryViewModel: ToDoItemEntryViewModel by lazyViewModel {
         appComponent().toDoItemEntryViewModel()
@@ -47,9 +44,9 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        toDoEntryViewModel.loadToDoItem(args.toDoItemId)
+        toDoEntryViewModel.loadToDoItem(arguments?.getString(TO_DO_ITEM_ID_KEY))
 
-        binding.textEditText.setImeOptions(EditorInfo.IME_ACTION_DONE)
+        binding.textEditText.imeOptions = EditorInfo.IME_ACTION_DONE
         binding.textEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
         binding.textEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -60,7 +57,6 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
             }
         }
 
-
         binding.closeButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -70,11 +66,11 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
         }
 
         binding.saveTextView.setOnClickListener {
-            toDoEntryViewModel.onSavePressed(args.toDoItemId)
+            toDoEntryViewModel.onSavePressed(arguments?.getString(TO_DO_ITEM_ID_KEY))
         }
 
         binding.deleteTextView.setOnClickListener {
-            toDoEntryViewModel.deleteToDoItem(args.toDoItemId)
+            toDoEntryViewModel.deleteToDoItem(arguments?.getString(TO_DO_ITEM_ID_KEY))
         }
 
         binding.deadlineSwitch.setOnClickListener {
@@ -103,7 +99,7 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
                 }
             }
 
-        binding.deleteTextView.isEnabled = args.toDoItemId != null
+        binding.deleteTextView.isEnabled = arguments?.getString(TO_DO_ITEM_ID_KEY) != null
 
         lifecycleScope.launch {
             launch {
@@ -116,7 +112,7 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
 
     private fun updateUI(toDoItemEntryUIState: ToDoItemEntryUIState) {
         when (toDoItemEntryUIState) {
-            ToDoItemEntryUIState.CanBeClosed -> {
+            ToDoItemEntryUIState.Closing -> {
                 findNavController().popBackStack()
             }
 
@@ -160,5 +156,10 @@ class ToDoItemEntryFragment : Fragment(R.layout.fragment_entry_to_do_item) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+
+        const val TO_DO_ITEM_ID_KEY = "TO_DO_ITEM_ID_KEY"
     }
 }

@@ -24,7 +24,7 @@ enum class ToDoItemImportance(val value: Int) {
                 }
 
                 else -> {
-                    error("Illegal string passed")
+                    error("Passed illegal value")
                 }
             }
         }

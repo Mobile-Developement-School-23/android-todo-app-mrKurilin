@@ -1,19 +1,19 @@
 package com.example.todoapp.data.local
 
 import androidx.room.TypeConverter
-import com.example.todoapp.data.local.model.ToDoItemAction
+import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 
 class Converters {
 
     @TypeConverter
-    fun toToDoItemAction(value: String?): ToDoItemAction? {
+    fun toToDoItemAction(value: String?): ToDoItemLocalRemoteAction? {
         return if (value == null) {
             null
         } else {
-            enumValueOf<ToDoItemAction>(value)
+            enumValueOf<ToDoItemLocalRemoteAction>(value)
         }
     }
 
     @TypeConverter
-    fun fromToDoItemAction(value: ToDoItemAction?) = value?.name
+    fun fromToDoItemAction(value: ToDoItemLocalRemoteAction?) = value?.name
 }

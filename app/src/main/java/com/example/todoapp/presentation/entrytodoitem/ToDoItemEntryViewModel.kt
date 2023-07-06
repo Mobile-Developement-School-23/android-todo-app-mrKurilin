@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.entry_to_do_item_fragment
+package com.example.todoapp.presentation.entrytodoitem
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,8 +7,8 @@ import com.example.todoapp.domain.usecase.AddToDoItemUseCase
 import com.example.todoapp.domain.usecase.DeleteToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.GetToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.UpdateToDoItemUseCase
-import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIMapper
-import com.example.todoapp.presentation.entry_to_do_item_fragment.model.ToDoItemUIModel
+import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIMapper
+import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,6 +17,10 @@ import kotlinx.coroutines.runBlocking
 import java.util.Date
 import javax.inject.Inject
 
+/**
+ * Managing the UI state and business logic related to creating and editing ToDoItems in the
+ * presentation layer of the application.
+ */
 class ToDoItemEntryViewModel @Inject constructor(
     private val toDoItemUIMapper: ToDoItemUIMapper,
     private val addToDoItemUseCase: AddToDoItemUseCase,
@@ -70,7 +74,7 @@ class ToDoItemEntryViewModel @Inject constructor(
             }
 
             _toDoItemEntryUIStateMutableStateFlow.update {
-                ToDoItemEntryUIState.CanBeClosed
+                ToDoItemEntryUIState.Closing
             }
         }
     }
@@ -98,7 +102,7 @@ class ToDoItemEntryViewModel @Inject constructor(
                 deleteToDoItemByIdUseCase.delete(toDoItemId)
             }
             _toDoItemEntryUIStateMutableStateFlow.update {
-                ToDoItemEntryUIState.CanBeClosed
+                ToDoItemEntryUIState.Closing
             }
         }
     }

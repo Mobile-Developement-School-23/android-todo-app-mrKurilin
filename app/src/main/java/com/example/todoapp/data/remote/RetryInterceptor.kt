@@ -6,6 +6,12 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import javax.inject.Inject
 
+const val RETRY_COUNT = 3
+const val WAIT_BETWEEN_RETRIES = 2000L
+
+/**
+ * Intercepting network requests and implementing retry logic for handling server errors.
+ */
 class RetryInterceptor @Inject constructor() : Interceptor {
 
     var tryCount = 0
@@ -13,18 +19,17 @@ class RetryInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val response = chain.proceed(request)
-        return if (response.code == 500) {
+        return if (response.code == SERVER_ERROR_CODE) {
 
-            if (tryCount < 3) {
-                Thread.sleep(2000)
+            if (tryCount < RETRY_COUNT) {
+                Thread.sleep(WAIT_BETWEEN_RETRIES)
                 tryCount++
                 response.close()
                 chain.call().clone().execute()
-
             }
             response.newBuilder()
-                .code(401) // Whatever code
-                .body("".toResponseBody(null)) // Whatever body
+                .code(SERVER_ERROR_CODE)
+                .body("".toResponseBody(null))
                 .protocol(Protocol.HTTP_2)
                 .message("Network Error")
                 .request(chain.request())

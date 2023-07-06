@@ -1,11 +1,14 @@
-package com.example.todoapp.presentation.login_fragment
+package com.example.todoapp.presentation.login
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
-import com.example.todoapp.data.local.SharedPreferencesConst.Companion.TOKEN_KEY
+import com.example.todoapp.data.local.TOKEN_KEY
 import com.example.todoapp.domain.usecase.CheckIsAuthorizedUseCase
 import javax.inject.Inject
 
+/**
+ * Managing the login-related functionality in the presentation layer of the application.
+ */
 class LoginViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val checkIsAuthorizedUseCase: CheckIsAuthorizedUseCase,

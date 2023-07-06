@@ -1,4 +1,4 @@
-package com.example.todoapp.presentation.login_fragment
+package com.example.todoapp.presentation.login
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,7 @@ import com.example.todoapp.R
 import com.example.todoapp.databinding.FragmentLoginBinding
 import com.example.todoapp.di.appComponent
 import com.example.todoapp.di.lazyViewModel
+import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
 
@@ -44,16 +45,20 @@ class LoginFragment : Fragment() {
                 if (token != null) {
                     loginViewModel.putToken(token.value)
                     findNavController().navigate(R.id.action_loginFragment_to_toDoListFragment)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        getText(R.string.failed_to_login),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
-            } catch (exception: Exception) {
-                //do nothing
+            } catch (yandexAuthException: YandexAuthException) {
+                Toast.makeText(
+                    requireContext(),
+                    getText(R.string.failed_to_login),
+                    Toast.LENGTH_LONG
+                ).show()
             }
-
-            Toast.makeText(
-                requireContext(),
-                getText(R.string.failed_to_login),
-                Toast.LENGTH_LONG
-            ).show()
         }
 
         _binding = FragmentLoginBinding.inflate(inflater, container, false)

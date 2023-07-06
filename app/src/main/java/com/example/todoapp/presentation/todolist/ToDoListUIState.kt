@@ -1,8 +1,11 @@
-package com.example.todoapp.presentation.to_do_list_fragment
+package com.example.todoapp.presentation.todolist
 
 import com.example.todoapp.presentation.Notification
-import com.example.todoapp.presentation.to_do_list_fragment.model.ToDoListItemUIModel
+import com.example.todoapp.presentation.todolist.model.ToDoListItemUIModel
 
+/**
+ * Represents the UI state of the ToDoList feature in the application.
+ */
 data class ToDoListUIState(
     val isDoneItemsVisible: Boolean = true,
     val isUpdatingData: Boolean = false,
