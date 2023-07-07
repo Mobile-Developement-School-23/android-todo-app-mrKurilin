@@ -17,10 +17,8 @@ class RetryInterceptor @Inject constructor() : Interceptor {
     var tryCount = 0
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request()
-        val response = chain.proceed(request)
+        val response = chain.proceed(chain.request())
         return if (response.code == SERVER_ERROR_CODE) {
-
             if (tryCount < RETRY_COUNT) {
                 Thread.sleep(WAIT_BETWEEN_RETRIES)
                 tryCount++

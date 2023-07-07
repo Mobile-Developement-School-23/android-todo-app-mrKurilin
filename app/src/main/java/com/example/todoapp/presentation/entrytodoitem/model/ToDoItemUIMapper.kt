@@ -28,7 +28,7 @@ class ToDoItemUIMapper @Inject constructor() {
         return ToDoItem(
             id = creationDate.time.toString(),
             text = toDoItemUIModel.text,
-            priority = ToDoItemImportance.from(toDoItemUIModel.priorityValue),
+            priority = ToDoItemImportance.fromValue(toDoItemUIModel.priorityValue),
             creationDate = creationDate,
             isDone = false,
             deadLineDate = deadLineDate,

@@ -2,6 +2,7 @@ package com.example.todoapp
 
 import android.app.Application
 import android.provider.Settings
+import android.provider.Settings.Secure.ANDROID_ID
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -9,8 +10,8 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.todoapp.data.CurrentDeviceId
 import com.example.todoapp.data.LocalListUpdateWorker
-import com.example.todoapp.di.AppComponent
-import com.example.todoapp.di.DaggerAppComponent
+import com.example.todoapp.di.component.AppComponent
+import com.example.todoapp.di.component.DaggerAppComponent
 import java.util.concurrent.TimeUnit
 
 const val UPDATE_PERIOD_HOURS = 8L
@@ -25,7 +26,9 @@ class ToDoApp : Application() {
 
         appComponent = DaggerAppComponent.factory().create(
             context = this,
-            currentDeviceId = CurrentDeviceId(Settings.Secure.ANDROID_ID)
+            currentDeviceId = CurrentDeviceId(
+                Settings.Secure.getString(contentResolver, ANDROID_ID)
+            )
         )
 
         enqueueLocalListUpdateWorker()

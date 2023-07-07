@@ -8,7 +8,6 @@ import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import com.example.todoapp.data.remote.LAST_KNOWN_REVISION_KEY
 import com.example.todoapp.data.remote.ToDoItemsRemoteDataSource
 import com.example.todoapp.data.remote.mapper.ToDoItemRemoteMapper
-import com.example.todoapp.data.remote.model.ToDoItemRemoteListResponse
 import com.example.todoapp.domain.model.ToDoItem
 import com.example.todoapp.domain.model.ToDoItemImportance
 import kotlinx.coroutines.flow.Flow
@@ -79,14 +78,8 @@ class ToDoItemsRepository @Inject constructor(
         toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
     }
 
-    suspend fun getSynchronizationResult(): Result<Any?> {
-        val toDoItemRemoteListResponse: ToDoItemRemoteListResponse
-
-        try {
-            toDoItemRemoteListResponse = toDoItemsRemoteDataSource.getToDoItemListRemote()
-        } catch (exception: Exception) {
-            return Result.failure(exception)
-        }
+    suspend fun getSynchronizationResult(): Result<Any?> = try {
+        val toDoItemRemoteListResponse = toDoItemsRemoteDataSource.getToDoItemListRemote()
 
         val currentDeviceRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, -1)
 
@@ -94,20 +87,14 @@ class ToDoItemsRepository @Inject constructor(
             val remoteList = toDoItemRemoteListResponse.list.map { toDoItemRemote ->
                 toDoItemLocalMapper.map(toDoItemRemote)
             }
-
-            toDoItemsLocalDataSource.updateLocalList(
-                remoteList = remoteList
-            )
+            toDoItemsLocalDataSource.updateLocalList(remoteList)
         }
 
         applyNewRevision(toDoItemRemoteListResponse.revision)
-
-        return try {
-            updateRemoteToDoList()
-            Result.success(null)
-        } catch (exception: Exception) {
-            Result.failure(exception)
-        }
+        updateRemoteToDoList()
+        Result.success(null)
+    } catch (exception: Exception) {
+        Result.failure(exception)
     }
 
     private suspend fun updateRemoteToDoList() {
@@ -144,6 +131,7 @@ class ToDoItemsRepository @Inject constructor(
             toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
             return
         }
+
 
         if (toDoItemLocal.toDoItemLocalRemoteAction != ToDoItemLocalRemoteAction.DELETE) {
             val updatedToDoItemLocal = toDoItemLocal.copy(toDoItemLocalRemoteAction = null)

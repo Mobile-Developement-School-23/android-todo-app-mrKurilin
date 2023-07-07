@@ -1,5 +1,6 @@
 package com.example.todoapp.presentation.entrytodoitem
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todoapp.domain.model.ToDoItemImportance
@@ -46,7 +47,7 @@ class ToDoItemEntryViewModel @Inject constructor(
                 toDoItemId = toDoItemId,
                 text = toDoItemUIModel.text,
                 deadLineDate = toDoItemUIModel.deadLineDate,
-                importance = ToDoItemImportance.from(toDoItemUIModel.priorityValue),
+                importance = ToDoItemImportance.fromValue(toDoItemUIModel.priorityValue),
             )
         }
 
@@ -134,5 +135,10 @@ class ToDoItemEntryViewModel @Inject constructor(
         _toDoItemEntryUIStateMutableStateFlow.update {
             ToDoItemEntryUIState.ToDoItemUIModelUpdated(updatedToDoItemUIModel)
         }
+    }
+
+    override fun onCleared() {
+        Log.d("TAGs", "onCleared: ")
+        super.onCleared()
     }
 }

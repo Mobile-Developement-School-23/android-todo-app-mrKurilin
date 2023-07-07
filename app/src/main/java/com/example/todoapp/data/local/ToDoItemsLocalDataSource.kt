@@ -1,7 +1,7 @@
 package com.example.todoapp.data.local
 
-import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import com.example.todoapp.data.local.model.ToDoItemLocal
+import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.random.Random
@@ -44,22 +44,28 @@ class ToDoItemsLocalDataSource @Inject constructor(
             it.id
         }
 
+        // delete remotely deleted to do items
         noRemoteActionsToDoItemLocalList.keys.subtract(remoteToItemsById.keys).forEach { id ->
             toDoItemLocalDao.deleteToDoItemById(id)
         }
 
+        // add remotely added to do items
         remoteToItemsById.keys.subtract(noRemoteActionsToDoItemLocalList.keys).forEach { id ->
-            val toDoItemLocal = remoteToItemsById[id]
-            if (toDoItemLocal != null) toDoItemLocalDao.insertToDoItemLocal(toDoItemLocal)
+            toDoItemLocalDao.insertToDoItemLocal(remoteToItemsById[id]!!)
         }
 
-        for (id in remoteToItemsById.keys.intersect(noRemoteActionsToDoItemLocalList.keys)) {
-            val toDoItemLocalFromRemote = remoteToItemsById[id]
-            val toDoItemLocal = noRemoteActionsToDoItemLocalList[id]
+        updateRemotelyUpdatedToDoItems(remoteToItemsById, noRemoteActionsToDoItemLocalList)
+    }
 
-            if (toDoItemLocalFromRemote == null || toDoItemLocal == null) {
-                continue
-            } else if (toDoItemLocal.editDateMillis < toDoItemLocalFromRemote.editDateMillis) {
+    private suspend fun updateRemotelyUpdatedToDoItems(
+        remoteToItemsById: Map<String, ToDoItemLocal>,
+        noRemoteActionsToDoItemLocalList: Map<String, ToDoItemLocal>
+    ) {
+        for (id in remoteToItemsById.keys.intersect(noRemoteActionsToDoItemLocalList.keys)) {
+            val toDoItemLocalFromRemote = remoteToItemsById[id]!!
+            val toDoItemLocal = noRemoteActionsToDoItemLocalList[id]!!
+
+            if (toDoItemLocal.editDateMillis < toDoItemLocalFromRemote.editDateMillis) {
                 toDoItemLocalDao.updateToDoItemLocal(toDoItemLocalFromRemote)
             }
         }

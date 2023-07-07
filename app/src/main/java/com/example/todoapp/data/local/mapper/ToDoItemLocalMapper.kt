@@ -26,7 +26,7 @@ class ToDoItemLocalMapper @Inject constructor() {
             isDone = toDoItemLocal.isDone,
             creationDate = Date(toDoItemLocal.creationDateMillis),
             editDate = Date(toDoItemLocal.editDateMillis),
-            priority = ToDoItemImportance.from(toDoItemLocal.importance),
+            priority = ToDoItemImportance.fromValue(toDoItemLocal.importance),
             deadLineDate = deadLineDate,
         )
     }

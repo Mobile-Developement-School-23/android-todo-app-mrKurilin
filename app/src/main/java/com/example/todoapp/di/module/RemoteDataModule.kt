@@ -1,10 +1,11 @@
-package com.example.todoapp.di
+package com.example.todoapp.di.module
 
 import android.content.Context
 import android.net.ConnectivityManager
 import com.example.todoapp.data.remote.AuthorizationInterceptor
 import com.example.todoapp.data.remote.RetryInterceptor
 import com.example.todoapp.data.remote.ToDoApiService
+import com.example.todoapp.di.scope.DataWorkScope
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -20,11 +21,13 @@ interface RemoteDataModule {
 
     companion object {
 
+        @DataWorkScope
         @Provides
         fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
             return HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         }
 
+        @DataWorkScope
         @Provides
         fun provideOkHttpClient(
             httpLoggingInterceptor: HttpLoggingInterceptor,
@@ -38,6 +41,7 @@ interface RemoteDataModule {
                 .build()
         }
 
+        @DataWorkScope
         @Provides
         fun toDoApiService(
             okHttpClient: OkHttpClient,
@@ -50,6 +54,7 @@ interface RemoteDataModule {
                 .create(ToDoApiService::class.java)
         }
 
+        @DataWorkScope
         @Provides
         fun provideConnectivityManager(
             context: Context

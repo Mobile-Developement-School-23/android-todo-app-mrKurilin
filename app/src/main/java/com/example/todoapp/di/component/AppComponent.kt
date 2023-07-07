@@ -1,23 +1,20 @@
-package com.example.todoapp.di
+package com.example.todoapp.di.component
 
 import android.content.Context
 import com.example.todoapp.data.CurrentDeviceId
-import com.example.todoapp.data.ToDoItemsRepository
-import com.example.todoapp.presentation.entrytodoitem.ToDoItemEntryViewModel
+import com.example.todoapp.di.module.AppModule
+import com.example.todoapp.di.scope.AppScope
 import com.example.todoapp.presentation.login.LoginViewModel
-import com.example.todoapp.presentation.todolist.ToDoListViewModel
 import dagger.BindsInstance
 import dagger.Component
-import javax.inject.Singleton
 
 /**
  * Managing the dependency graph of the application.
  */
-@Singleton
+@AppScope
 @Component(
     modules = [
-        LocalDataModule::class,
-        RemoteDataModule::class
+        AppModule::class,
     ]
 )
 interface AppComponent {
@@ -33,11 +30,7 @@ interface AppComponent {
         ): AppComponent
     }
 
-    fun toDoItemEntryViewModel(): ToDoItemEntryViewModel
-
-    fun toDoListViewModel(): ToDoListViewModel
+    fun dataWorkComponent(): DataWorkComponent
 
     fun loginViewModel(): LoginViewModel
-
-    fun toDoItemsRepository(): ToDoItemsRepository
 }

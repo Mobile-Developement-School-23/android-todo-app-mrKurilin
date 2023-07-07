@@ -16,7 +16,8 @@ class LocalListUpdateWorker @Inject constructor(
 
     override suspend fun doWork(): Result {
         val toDoApp = context.applicationContext as ToDoApp
-        val todoItemsRepository = toDoApp.provideAppComponent().toDoItemsRepository()
+        val dataWorkComponent = toDoApp.provideAppComponent().dataWorkComponent()
+        val todoItemsRepository = dataWorkComponent.toDoItemsRepository()
         val result = todoItemsRepository.getSynchronizationResult()
         return if (result.isSuccess) {
             Result.success()

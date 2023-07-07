@@ -2,8 +2,8 @@ package com.example.todoapp.presentation.login
 
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
+import com.example.todoapp.data.local.NOT_AUTHORIZED
 import com.example.todoapp.data.local.TOKEN_KEY
-import com.example.todoapp.domain.usecase.CheckIsAuthorizedUseCase
 import javax.inject.Inject
 
 /**
@@ -11,7 +11,6 @@ import javax.inject.Inject
  */
 class LoginViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
-    private val checkIsAuthorizedUseCase: CheckIsAuthorizedUseCase,
 ) : ViewModel() {
 
     fun putToken(token: String) {
@@ -19,6 +18,6 @@ class LoginViewModel @Inject constructor(
     }
 
     fun isAuthorized(): Boolean {
-        return checkIsAuthorizedUseCase.isAuthorized()
+        return sharedPreferences.getString(TOKEN_KEY, NOT_AUTHORIZED) != NOT_AUTHORIZED
     }
 }

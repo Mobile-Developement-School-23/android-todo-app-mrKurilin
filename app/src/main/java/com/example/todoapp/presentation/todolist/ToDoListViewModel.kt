@@ -1,8 +1,10 @@
 package com.example.todoapp.presentation.todolist
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.todoapp.domain.usecase.CheckIsAuthorizedUseCase
+import com.example.todoapp.data.local.NOT_AUTHORIZED
+import com.example.todoapp.data.local.TOKEN_KEY
 import com.example.todoapp.domain.usecase.DeleteToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.GetToDoItemListFlowUseCase
 import com.example.todoapp.domain.usecase.LogOutUseCase
@@ -31,11 +33,11 @@ class ToDoListViewModel @Inject constructor(
     private val updateDataUseCase: UpdateDataUseCase,
     private val logOutUseCase: LogOutUseCase,
     private val connectivityStateObserver: ConnectivityStateObserver,
-    checkIsAuthorizedUseCase: CheckIsAuthorizedUseCase,
+    private val sharedPreferences: SharedPreferences,
 ) : ViewModel() {
 
     private val _toDoListUIStateMutableStateFlow = MutableStateFlow(
-        ToDoListUIState(isAuthorized = checkIsAuthorizedUseCase.isAuthorized())
+        ToDoListUIState(isAuthorized = isAuthorized())
     )
     val toDoListUIStateStateFlow = _toDoListUIStateMutableStateFlow.asStateFlow()
 
@@ -130,5 +132,9 @@ class ToDoListViewModel @Inject constructor(
             )
             _toDoListUIStateMutableStateFlow.update { updatedToDoListUIState }
         }
+    }
+
+    private fun isAuthorized(): Boolean {
+        return sharedPreferences.getString(TOKEN_KEY, NOT_AUTHORIZED) != NOT_AUTHORIZED
     }
 }

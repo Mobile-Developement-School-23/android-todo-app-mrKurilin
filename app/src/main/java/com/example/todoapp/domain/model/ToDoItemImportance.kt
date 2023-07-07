@@ -1,11 +1,28 @@
 package com.example.todoapp.domain.model
 
-enum class ToDoItemImportance(val value: Int) {
-    LOW(0), BASIC(1), IMPORTANT(2);
+enum class ToDoItemImportance(val value: Int) { LOW(0),
+
+    BASIC(1),
+
+    IMPORTANT(2);
+
+    override fun toString(): String = when (this) {
+        LOW -> {
+            "low"
+        }
+
+        BASIC -> {
+            "basic"
+        }
+
+        IMPORTANT -> {
+            "important"
+        }
+    }
 
     companion object {
 
-        fun from(value: Int): ToDoItemImportance {
+        fun fromValue(value: Int): ToDoItemImportance {
             return ToDoItemImportance.values().firstOrNull { it.value == value }!!
         }
 
