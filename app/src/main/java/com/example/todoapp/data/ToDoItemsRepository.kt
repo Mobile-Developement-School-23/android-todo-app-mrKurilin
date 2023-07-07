@@ -78,7 +78,7 @@ class ToDoItemsRepository @Inject constructor(
         toDoItemsLocalDataSource.updateToDoItemLocal(updatedToDoItemLocal)
     }
 
-    suspend fun getSynchronizationResult(): Result<Any?> = try {
+    suspend fun synchronizeData() {
         val toDoItemRemoteListResponse = toDoItemsRemoteDataSource.getToDoItemListRemote()
 
         val currentDeviceRevision = sharedPreferences.getInt(LAST_KNOWN_REVISION_KEY, -1)
@@ -93,8 +93,6 @@ class ToDoItemsRepository @Inject constructor(
         applyNewRevision(toDoItemRemoteListResponse.revision)
         updateRemoteToDoList()
         Result.success(null)
-    } catch (exception: Exception) {
-        Result.failure(exception)
     }
 
     private suspend fun updateRemoteToDoList() {

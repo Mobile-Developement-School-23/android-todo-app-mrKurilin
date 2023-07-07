@@ -3,19 +3,9 @@ package com.example.todoapp
 import android.app.Application
 import android.provider.Settings
 import android.provider.Settings.Secure.ANDROID_ID
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.todoapp.data.CurrentDeviceId
-import com.example.todoapp.data.LocalListUpdateWorker
 import com.example.todoapp.di.component.AppComponent
 import com.example.todoapp.di.component.DaggerAppComponent
-import java.util.concurrent.TimeUnit
-
-const val UPDATE_PERIOD_HOURS = 8L
-const val FLEX_UPDATE_PERIOD_HOURS = 1L
 
 class ToDoApp : Application() {
 
@@ -30,30 +20,9 @@ class ToDoApp : Application() {
                 Settings.Secure.getString(contentResolver, ANDROID_ID)
             )
         )
-
-        enqueueLocalListUpdateWorker()
     }
 
     fun provideAppComponent(): AppComponent {
         return appComponent
-    }
-
-    private fun enqueueLocalListUpdateWorker() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val workRequest = PeriodicWorkRequestBuilder<LocalListUpdateWorker>(
-            UPDATE_PERIOD_HOURS,
-            TimeUnit.HOURS,
-            FLEX_UPDATE_PERIOD_HOURS,
-            TimeUnit.HOURS,
-        ).setConstraints(constraints).build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "LocalListUpdateWorker",
-            ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
-        )
     }
 }

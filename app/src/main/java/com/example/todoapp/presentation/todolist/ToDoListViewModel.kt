@@ -14,6 +14,7 @@ import com.example.todoapp.presentation.Notification
 import com.example.todoapp.presentation.todolist.model.ToDoListItemUIMapper
 import com.example.todoapp.presentation.util.ConnectivityStateObserver
 import com.example.todoapp.presentation.util.NetworkConnectivityState
+import com.example.todoapp.worker.WorkerSupplier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -34,6 +35,7 @@ class ToDoListViewModel @Inject constructor(
     private val logOutUseCase: LogOutUseCase,
     private val connectivityStateObserver: ConnectivityStateObserver,
     private val sharedPreferences: SharedPreferences,
+    workerSupplier: WorkerSupplier,
 ) : ViewModel() {
 
     private val _toDoListUIStateMutableStateFlow = MutableStateFlow(
@@ -44,6 +46,11 @@ class ToDoListViewModel @Inject constructor(
     init {
         observeConnectivityState()
         observeToDoItemList()
+        if (isAuthorized()) {
+            workerSupplier.enqueueSynchronizeDataWorker()
+        } else {
+            workerSupplier.cancelSynchronizeDataWorker()
+        }
     }
 
     fun deleteToDoItem(toDoItemId: String) = viewModelScope.launch {
