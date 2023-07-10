@@ -16,7 +16,7 @@ class SynchronizeDataWorker @Inject constructor(
 
     override suspend fun doWork(): Result = try {
         val toDoApp = applicationContext as ToDoApp
-        val component = toDoApp.provideAppComponent().dataWorkComponent()
+        val component = toDoApp.provideAppComponent()
         val todoItemsRepository = component.toDoItemsRepository()
         todoItemsRepository.synchronizeData()
         Result.success()

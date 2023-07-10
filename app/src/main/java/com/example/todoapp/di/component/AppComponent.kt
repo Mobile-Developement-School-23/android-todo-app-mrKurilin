@@ -2,7 +2,9 @@ package com.example.todoapp.di.component
 
 import android.content.Context
 import com.example.todoapp.data.CurrentDeviceId
-import com.example.todoapp.di.module.AppModule
+import com.example.todoapp.data.ToDoItemsRepository
+import com.example.todoapp.di.module.LocalDataModule
+import com.example.todoapp.di.module.RemoteDataModule
 import com.example.todoapp.di.scope.AppScope
 import com.example.todoapp.presentation.login.LoginViewModel
 import dagger.BindsInstance
@@ -14,7 +16,8 @@ import dagger.Component
 @AppScope
 @Component(
     modules = [
-        AppModule::class,
+        LocalDataModule::class,
+        RemoteDataModule::class
     ]
 )
 interface AppComponent {
@@ -29,6 +32,8 @@ interface AppComponent {
             currentDeviceId: CurrentDeviceId,
         ): AppComponent
     }
+
+    fun toDoItemsRepository(): ToDoItemsRepository
 
     fun dataWorkComponent(): DataWorkComponent
 

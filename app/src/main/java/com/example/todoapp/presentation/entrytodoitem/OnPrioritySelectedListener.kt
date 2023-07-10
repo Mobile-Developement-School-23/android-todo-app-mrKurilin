@@ -16,7 +16,5 @@ class OnPrioritySelectedListener(
         onItemSelectedAction(parent, view, position, id)
     }
 
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        //do nothing
-    }
+    override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 }

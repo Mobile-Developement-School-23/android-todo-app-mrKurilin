@@ -32,7 +32,10 @@ interface ToDoItemLocalDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $TO_DO_ITEM_ACTION_COLUMN_NAME IS NOT NULL")
     suspend fun toDoItemLocalWithRemoteActionList(): List<ToDoItemLocal>
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $TO_DO_ITEM_ACTION_COLUMN_NAME IS NULL")
+    @Query("SELECT * FROM $TABLE_NAME WHERE " +
+            "$TO_DO_ITEM_ACTION_COLUMN_NAME IS NOT 'DELETE' " +
+            "AND " +
+            "$TO_DO_ITEM_ACTION_COLUMN_NAME IS NOT 'ADD'")
     suspend fun noRemoteActionsToDoItemLocalList(): List<ToDoItemLocal>
 
     @Query("SELECT $ID_COLUMN_NAME FROM $TABLE_NAME")

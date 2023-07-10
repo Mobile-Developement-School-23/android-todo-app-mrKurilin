@@ -7,7 +7,6 @@ import com.example.todoapp.data.local.NOT_AUTHORIZED
 import com.example.todoapp.data.local.TOKEN_KEY
 import com.example.todoapp.domain.usecase.DeleteToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.GetToDoItemListFlowUseCase
-import com.example.todoapp.domain.usecase.LogOutUseCase
 import com.example.todoapp.domain.usecase.SetDoneToDoItemUseCase
 import com.example.todoapp.domain.usecase.UpdateDataUseCase
 import com.example.todoapp.presentation.Notification
@@ -32,7 +31,6 @@ class ToDoListViewModel @Inject constructor(
     private val deleteToDoItemByIdUseCase: DeleteToDoItemByIdUseCase,
     private val setDoneToDoItemUseCase: SetDoneToDoItemUseCase,
     private val updateDataUseCase: UpdateDataUseCase,
-    private val logOutUseCase: LogOutUseCase,
     private val connectivityStateObserver: ConnectivityStateObserver,
     private val sharedPreferences: SharedPreferences,
     workerSupplier: WorkerSupplier,
@@ -101,7 +99,7 @@ class ToDoListViewModel @Inject constructor(
     }
 
     fun logOut() {
-        logOutUseCase.logOut()
+        sharedPreferences.edit().putString(TOKEN_KEY, NOT_AUTHORIZED).apply()
     }
 
     private fun observeConnectivityState() = viewModelScope.launch {
