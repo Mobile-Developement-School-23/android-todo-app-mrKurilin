@@ -141,4 +141,8 @@ class ToDoItemEntryViewModel @Inject constructor(
         Log.d("TAGs", "onCleared: ")
         super.onCleared()
     }
+
+    fun onClosePressed(){
+
+    }
 }
