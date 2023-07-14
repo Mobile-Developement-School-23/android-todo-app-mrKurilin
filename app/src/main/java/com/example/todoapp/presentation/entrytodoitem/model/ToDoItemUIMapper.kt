@@ -1,5 +1,6 @@
 package com.example.todoapp.presentation.entrytodoitem.model
 
+import com.example.todoapp.R
 import com.example.todoapp.domain.model.ToDoItem
 import com.example.todoapp.domain.model.ToDoItemImportance
 import java.util.Date
@@ -11,9 +12,23 @@ import javax.inject.Inject
 class ToDoItemUIMapper @Inject constructor() {
 
     fun map(todoItem: ToDoItem): ToDoItemUIModel {
+        val priorityStringId = when (todoItem.priority) {
+            ToDoItemImportance.LOW -> {
+                R.string.low
+            }
+
+            ToDoItemImportance.BASIC -> {
+                R.string.basic
+            }
+
+            ToDoItemImportance.IMPORTANT -> {
+                R.string.high_importance
+            }
+        }
         return ToDoItemUIModel(
+            id = todoItem.id,
             text = todoItem.text,
-            priorityValue = todoItem.priority.value,
+            priorityStringId = priorityStringId,
             deadLineDate = todoItem.deadLineDate?.time
         )
     }
@@ -28,7 +43,7 @@ class ToDoItemUIMapper @Inject constructor() {
         return ToDoItem(
             id = creationDate.time.toString(),
             text = toDoItemUIModel.text,
-            priority = ToDoItemImportance.fromValue(toDoItemUIModel.priorityValue),
+            priority = ToDoItemImportance.fromValue(toDoItemUIModel.priorityStringId),
             creationDate = creationDate,
             isDone = false,
             deadLineDate = deadLineDate,

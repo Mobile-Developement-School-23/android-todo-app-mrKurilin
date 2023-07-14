@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import com.example.todoapp.R
 import com.example.todoapp.di.dataWorkComponent
 import com.example.todoapp.di.lazyViewModel
-import com.example.todoapp.presentation.entrytodoitem.compose.AppTheme
 import com.example.todoapp.presentation.entrytodoitem.compose.ToDoItemEntryScreen
 
 class ToDoItemEntryFragment : Fragment() {
@@ -18,33 +16,26 @@ class ToDoItemEntryFragment : Fragment() {
         dataWorkComponent().toDoItemEntryViewModel()
     }
 
-//    private var _binding: FragmentEntryToDoItemBinding? = null
-//    private val binding get() = _binding!!
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        _binding = FragmentEntryToDoItemBinding.inflate(inflater, container, false)
-//        return binding.root
-        return inflater.inflate(R.layout.fragment_entry_to_do_item_compose, container, false)
-            .apply {
-                findViewById<ComposeView>(R.id.compose_view).setContent {
-                    AppTheme {
-                        ToDoItemEntryScreen(
-                            arguments?.getString(TO_DO_ITEM_ID_KEY),
-                            toDoEntryViewModel
-                        )
-                    }
-                }
+        return ComposeView(requireContext()).apply {
+            setContent {
+                ToDoItemEntryScreen(
+                    toDoEntryViewModel.uiState,
+                    onToDoItemEntryUIAction = toDoEntryViewModel::onToDoItemEntryUIAction
+                )
             }
+        }
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        toDoEntryViewModel.loadToDoItem(arguments?.getString(TO_DO_ITEM_ID_KEY))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        toDoEntryViewModel.loadToDoItem(arguments?.getString(TO_DO_ITEM_ID_KEY))
+    }
 //
 //        setClickListeners()
 //        setChangeListeners()

@@ -11,7 +11,14 @@ data class ThemeColors(
     val labelDisable: Color = Color.Unspecified,
     val backPrimary: Color = Color.Unspecified,
     val backSecondary: Color = Color.Unspecified,
-    val backElevated: Color = Color.Unspecified
+    val backElevated: Color = Color.Unspecified,
+    val red: Color = Color(0xFFFF3B30),
+    val green: Color = Color(0xFF34C759),
+    val blue: Color = Color(0xFF007AFF),
+    val blueTranslucent: Color = Color(0x4D007AFF),
+    val gray: Color = Color(0xFF8E8E93),
+    val grayLight: Color = Color(0xFFD1D1D6),
+    val white: Color = Color(0xFFFFFFFF),
 ) {
 
     companion object {
@@ -45,12 +52,4 @@ data class ThemeColors(
         }
     }
 }
-
-val Red = Color(0xFFFF3B30)
-val Green = Color(0xFF34C759)
-val Blue = Color(0xFF007AFF)
-val BlueTranslucent = Color(0x4D007AFF)
-val Gray = Color(0xFF8E8E93)
-val GrayLight = Color(0xFFD1D1D6)
-val White = Color(0xFFFFFFFF)
 
