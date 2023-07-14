@@ -8,5 +8,4 @@ import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIModel
 data class ToDoItemEntryUIState(
     val isLoading: Boolean = false,
     val toDoItemUIModel: ToDoItemUIModel = ToDoItemUIModel(),
-    val canBeClosed: Boolean = false
 )

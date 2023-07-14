@@ -37,7 +37,8 @@ fun AnimatedVisibilityCalendarView(
                     onToDoItemEntryUIAction(
                         ToDoItemEntryUIAction.SelectedDateChanged(
                             Calendar.getInstance().also {
-                                it.set(year, month, dayOfMonth)
+                                it.set(year, month, dayOfMonth, 0, 0, 0)
+                                it.set(Calendar.MILLISECOND, 0)
                             }.timeInMillis
                         )
                     )

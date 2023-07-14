@@ -147,4 +147,10 @@ class ToDoItemsRepository @Inject constructor(
     private fun applyNewRevision(revision: Int) {
         sharedPreferences.edit().putInt(LAST_KNOWN_REVISION_KEY, revision).apply()
     }
+
+    fun getCurrentDeadLineToDoItems(today: Long): List<ToDoItem> {
+        return toDoItemsLocalDataSource.getCurrentDeadLineToDoItems(today).map {
+            toDoItemLocalMapper.map(it)
+        }
+    }
 }

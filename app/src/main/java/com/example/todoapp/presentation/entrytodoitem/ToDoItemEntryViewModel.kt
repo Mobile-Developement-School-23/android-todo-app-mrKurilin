@@ -12,6 +12,8 @@ import com.example.todoapp.domain.usecase.GetToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.UpdateToDoItemUseCase
 import com.example.todoapp.presentation.entrytodoitem.compose.ToDoItemEntryUIAction
 import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIMapper
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -31,6 +33,9 @@ class ToDoItemEntryViewModel @Inject constructor(
     var uiState by mutableStateOf(ToDoItemEntryUIState())
         private set
 
+    private val _canBeClosed = MutableStateFlow(false)
+    val canBeClosed = _canBeClosed.asStateFlow()
+
     private fun onSavePressed() = viewModelScope.launch {
         val toDoItemUIModel = uiState.toDoItemUIModel
 
@@ -47,7 +52,7 @@ class ToDoItemEntryViewModel @Inject constructor(
             )
         }
 
-        uiState = uiState.copy(canBeClosed = true)
+        _canBeClosed.value = true
     }
 
     fun loadToDoItem(toDoItemId: String?) = viewModelScope.launch {
@@ -66,7 +71,7 @@ class ToDoItemEntryViewModel @Inject constructor(
         uiState = uiState.copy(isLoading = true)
 
         deleteToDoItemByIdUseCase.delete(id)
-        uiState = uiState.copy(canBeClosed = true)
+        _canBeClosed.value = true
     }
 
     private fun onDeadLineSwitchPressed() {
@@ -98,7 +103,7 @@ class ToDoItemEntryViewModel @Inject constructor(
     fun onToDoItemEntryUIAction(toDoItemEntryUIAction: ToDoItemEntryUIAction) {
         when (toDoItemEntryUIAction) {
             ToDoItemEntryUIAction.CloseButtonPressed -> {
-                uiState = uiState.copy(canBeClosed = true)
+                _canBeClosed.value = true
             }
 
             ToDoItemEntryUIAction.DeadLineSwitchStateChanged -> {

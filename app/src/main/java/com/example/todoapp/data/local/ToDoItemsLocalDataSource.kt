@@ -104,4 +104,8 @@ class ToDoItemsLocalDataSource @Inject constructor(
             )
         )
     }
+
+    fun getCurrentDeadLineToDoItems(today: Long): List<ToDoItemLocal> {
+        return toDoItemLocalDao.getCurrentDeadLineToDoItems(today)
+    }
 }

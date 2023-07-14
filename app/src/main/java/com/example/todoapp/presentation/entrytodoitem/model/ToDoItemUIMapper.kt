@@ -40,10 +40,28 @@ class ToDoItemUIMapper @Inject constructor() {
         } else {
             Date(toDoItemUIModel.deadLineDate)
         }
+
+        val priority = when (toDoItemUIModel.priorityStringId) {
+            R.string.low -> {
+                ToDoItemImportance.LOW
+            }
+
+            R.string.basic -> {
+                ToDoItemImportance.BASIC
+            }
+
+            R.string.high_importance -> {
+                ToDoItemImportance.IMPORTANT
+            }
+
+            else -> {
+                error("Illegal string id")
+            }
+        }
         return ToDoItem(
             id = creationDate.time.toString(),
             text = toDoItemUIModel.text,
-            priority = ToDoItemImportance.fromValue(toDoItemUIModel.priorityStringId),
+            priority = priority,
             creationDate = creationDate,
             isDone = false,
             deadLineDate = deadLineDate,
