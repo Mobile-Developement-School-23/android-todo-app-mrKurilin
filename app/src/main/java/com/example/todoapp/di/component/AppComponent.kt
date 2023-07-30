@@ -7,6 +7,7 @@ import com.example.todoapp.di.module.LocalDataModule
 import com.example.todoapp.di.module.RemoteDataModule
 import com.example.todoapp.di.scope.AppScope
 import com.example.todoapp.presentation.login.LoginViewModel
+import com.example.todoapp.presentation.notification.ReminderManager
 import dagger.BindsInstance
 import dagger.Component
 
@@ -34,6 +35,8 @@ interface AppComponent {
     }
 
     fun toDoItemsRepository(): ToDoItemsRepository
+
+    fun reminderManager(): ReminderManager
 
     fun dataWorkComponent(): DataWorkComponent
 

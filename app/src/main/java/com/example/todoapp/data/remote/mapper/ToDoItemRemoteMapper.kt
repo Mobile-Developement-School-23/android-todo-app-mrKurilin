@@ -16,12 +16,11 @@ class ToDoItemRemoteMapper @Inject constructor(
 ) {
 
     fun map(toDoItemLocal: ToDoItemLocal): ToDoItemRemote {
-
         return ToDoItemRemote(
             id = toDoItemLocal.id,
             text = toDoItemLocal.text,
             importance = ToDoItemImportance.fromValue(toDoItemLocal.importance).toString(),
-            deadLineDateMillis = toDoItemLocal.deadLineDateMillis,
+            deadLineEpochDay = toDoItemLocal.deadLineEpochDay,
             isDone = toDoItemLocal.isDone,
             creationDateMillis = toDoItemLocal.creationDateMillis,
             editDateMillis = toDoItemLocal.editDateMillis,

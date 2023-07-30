@@ -1,8 +1,10 @@
 package com.example.todoapp.data.local
 
+import com.example.todoapp.data.DAY_MILLIS
 import com.example.todoapp.data.local.model.ToDoItemLocal
 import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -99,9 +101,14 @@ class ToDoItemsLocalDataSource @Inject constructor(
                 isDone = Random.nextBoolean(),
                 creationDateMillis = Random.nextLong(),
                 importance = Random.nextInt(0, 2),
-                deadLineDateMillis = Random.nextLong(),
+                deadLineEpochDay = Random.nextLong(),
                 toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.ADD,
             )
         )
+    }
+
+    fun getCurrentDeadLineToDoItems(): List<ToDoItemLocal> {
+        val currentEpochDay = Date().time / DAY_MILLIS
+        return toDoItemLocalDao.getCurrentDeadLineToDoItems(currentEpochDay)
     }
 }

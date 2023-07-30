@@ -1,7 +1,8 @@
 package com.example.todoapp.data.local.mapper
 
-import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
+import com.example.todoapp.data.DAY_MILLIS
 import com.example.todoapp.data.local.model.ToDoItemLocal
+import com.example.todoapp.data.local.model.ToDoItemLocalRemoteAction
 import com.example.todoapp.data.remote.model.ToDoItemRemote
 import com.example.todoapp.domain.model.ToDoItem
 import com.example.todoapp.domain.model.ToDoItemImportance
@@ -14,10 +15,10 @@ import javax.inject.Inject
 class ToDoItemLocalMapper @Inject constructor() {
 
     fun map(toDoItemLocal: ToDoItemLocal): ToDoItem {
-        val deadLineDate = if (toDoItemLocal.deadLineDateMillis == null) {
+        val deadLineDate = if (toDoItemLocal.deadLineEpochDay == null) {
             null
         } else {
-            Date(toDoItemLocal.deadLineDateMillis)
+            Date(toDoItemLocal.deadLineEpochDay * DAY_MILLIS)
         }
 
         return ToDoItem(
@@ -32,6 +33,12 @@ class ToDoItemLocalMapper @Inject constructor() {
     }
 
     fun map(toDoItem: ToDoItem): ToDoItemLocal {
+        val deadLineEpochDay = if (toDoItem.deadLineDate == null) {
+            null
+        } else {
+            toDoItem.deadLineDate.time / DAY_MILLIS
+        }
+
         return ToDoItemLocal(
             id = toDoItem.id,
             text = toDoItem.text,
@@ -39,7 +46,7 @@ class ToDoItemLocalMapper @Inject constructor() {
             creationDateMillis = toDoItem.creationDate.time,
             editDateMillis = toDoItem.editDate.time,
             importance = toDoItem.priority.value,
-            deadLineDateMillis = toDoItem.deadLineDate?.time,
+            deadLineEpochDay = deadLineEpochDay,
             toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.ADD
         )
     }
@@ -53,7 +60,7 @@ class ToDoItemLocalMapper @Inject constructor() {
             creationDateMillis = toDoItemRemote.creationDateMillis,
             editDateMillis = toDoItemRemote.editDateMillis,
             importance = importance.value,
-            deadLineDateMillis = toDoItemRemote.deadLineDateMillis,
+            deadLineEpochDay = toDoItemRemote.deadLineEpochDay,
         )
     }
 }

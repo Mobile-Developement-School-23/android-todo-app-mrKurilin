@@ -16,7 +16,7 @@ data class ToDoItemLocal(
     @ColumnInfo(name = CREATION_DATE_MILLIS_COLUMN_NAME) val creationDateMillis: Long,
     @ColumnInfo(name = EDIT_DATE_MILLIS_COLUMN_NAME) val editDateMillis: Long = creationDateMillis,
     @ColumnInfo(name = IMPORTANCE_COLUMN_NAME) val importance: Int,
-    @ColumnInfo(name = DEADLINE_DATE_MILLIS_COLUMN_NAME) val deadLineDateMillis: Long?,
+    @ColumnInfo(name = DEADLINE_EPOCH_DAY_COLUMN_NAME) val deadLineEpochDay: Long?,
     @ColumnInfo(name = TO_DO_ITEM_ACTION_COLUMN_NAME) val toDoItemLocalRemoteAction: ToDoItemLocalRemoteAction? = null,
 ) {
 
@@ -29,7 +29,7 @@ data class ToDoItemLocal(
         const val CREATION_DATE_MILLIS_COLUMN_NAME = "creation_date_millis"
         const val EDIT_DATE_MILLIS_COLUMN_NAME = "edit_date_millis"
         const val IMPORTANCE_COLUMN_NAME = "importance"
-        const val DEADLINE_DATE_MILLIS_COLUMN_NAME = "deadline_date_millis"
+        const val DEADLINE_EPOCH_DAY_COLUMN_NAME = "deadline_date_millis"
         const val TO_DO_ITEM_ACTION_COLUMN_NAME = "is_loaded_to_remote"
     }
 }

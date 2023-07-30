@@ -1,6 +1,8 @@
 package com.example.todoapp.presentation.entrytodoitem
 
-import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todoapp.domain.model.ToDoItemImportance
@@ -8,10 +10,10 @@ import com.example.todoapp.domain.usecase.AddToDoItemUseCase
 import com.example.todoapp.domain.usecase.DeleteToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.GetToDoItemByIdUseCase
 import com.example.todoapp.domain.usecase.UpdateToDoItemUseCase
+import com.example.todoapp.presentation.entrytodoitem.compose.ToDoItemEntryUIAction
 import com.example.todoapp.presentation.entrytodoitem.model.ToDoItemUIMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
@@ -28,121 +30,100 @@ class ToDoItemEntryViewModel @Inject constructor(
     private val getToDoItemByIdUseCase: GetToDoItemByIdUseCase,
 ) : ViewModel() {
 
-    private val _toDoItemEntryUIStateMutableStateFlow = MutableStateFlow<ToDoItemEntryUIState>(
-        ToDoItemEntryUIState.Loading
-    )
-    val toDoItemEntryUIStateMutableStateFlow = _toDoItemEntryUIStateMutableStateFlow.asStateFlow()
+    var uiState by mutableStateOf(ToDoItemEntryUIState())
+        private set
 
-    fun onSavePressed(toDoItemId: String?) = viewModelScope.launch {
-        val toDoItemUIModel = _toDoItemEntryUIStateMutableStateFlow.value.toDoItemUIModel
+    private val _canBeClosed = MutableStateFlow(false)
+    val canBeClosed = _canBeClosed.asStateFlow()
 
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.Loading
-        }
+    private fun onSavePressed() = viewModelScope.launch {
+        val toDoItemUIModel = uiState.toDoItemUIModel
 
-        if (toDoItemId == null) {
+        uiState = uiState.copy(isLoading = true)
+
+        if (toDoItemUIModel.id == null) {
             addToDoItemUseCase.add(toDoItemUIMapper.map(toDoItemUIModel))
         } else {
             updateToDoItemUseCase.update(
-                toDoItemId = toDoItemId,
+                toDoItemId = toDoItemUIModel.id,
                 text = toDoItemUIModel.text,
-                deadLineDate = toDoItemUIModel.deadLineDate,
-                importance = ToDoItemImportance.fromValue(toDoItemUIModel.priorityValue),
+                deadLineDateMillis = toDoItemUIModel.deadLineDateMillis,
+                importance = ToDoItemImportance.fromStringId(toDoItemUIModel.priorityStringId),
             )
         }
-
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.Closing
-        }
+        _canBeClosed.value = true
     }
 
     fun loadToDoItem(toDoItemId: String?) = viewModelScope.launch {
+        uiState = uiState.copy(isLoading = true)
         if (toDoItemId != null) {
             val toDoItem = getToDoItemByIdUseCase.get(toDoItemId)
             val toDoItemUIModel = toDoItemUIMapper.map(toDoItem)
-            _toDoItemEntryUIStateMutableStateFlow.update {
-                ToDoItemEntryUIState.ToDoItemUIModelUpdated(toDoItemUIModel)
-            }
-        } else {
-            _toDoItemEntryUIStateMutableStateFlow.update {
-                ToDoItemEntryUIState.ShowInit
-            }
+            uiState = uiState.copy(toDoItemUIModel = toDoItemUIModel)
         }
+        uiState = uiState.copy(isLoading = false)
     }
 
-    fun deleteToDoItem(toDoItemId: String?) = viewModelScope.launch {
-        if (toDoItemId == null) {
-            return@launch
-        }
+    private fun deleteToDoItem() = viewModelScope.launch {
+        val id = uiState.toDoItemUIModel.id ?: return@launch
 
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.Loading
-        }
+        uiState = uiState.copy(isLoading = true)
 
-        deleteToDoItemByIdUseCase.delete(toDoItemId)
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.Closing
-        }
+        deleteToDoItemByIdUseCase.delete(id)
+        _canBeClosed.value = true
     }
 
-    fun onDeadLineSwitchPressed() {
-        val toDoItemUIModel = _toDoItemEntryUIStateMutableStateFlow.value.toDoItemUIModel
-
-        val deadLineDate = if (toDoItemUIModel.deadLineDate == null) {
+    private fun onDeadLineSwitchPressed() {
+        val deadLineDate = if (uiState.toDoItemUIModel.deadLineDateMillis == null) {
             Date().time
         } else {
             null
         }
-        val updatedToDoItemUIModel = toDoItemUIModel.copy(
-            deadLineDate = deadLineDate
-        )
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.ToDoItemUIModelUpdated(updatedToDoItemUIModel)
+        val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(deadLineDateMillis = deadLineDate)
+        uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
+    }
+
+    private fun textChanged(text: String) {
+        if (text != uiState.toDoItemUIModel.text) {
+            val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(text = text)
+            uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
         }
     }
 
-    fun onDeadLineDateChanged(dateLong: Long) {
-        val toDoItemUIModel = _toDoItemEntryUIStateMutableStateFlow.value.toDoItemUIModel
-        val updatedToDoItemUIModel = toDoItemUIModel.copy(
-            deadLineDate = dateLong
-        )
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.ToDoItemUIModelUpdated(updatedToDoItemUIModel)
-        }
-    }
+    fun onToDoItemEntryUIAction(toDoItemEntryUIAction: ToDoItemEntryUIAction) {
+        when (toDoItemEntryUIAction) {
+            ToDoItemEntryUIAction.CloseButtonPressed -> {
+                _canBeClosed.value = true
+            }
 
-    fun textChanged(text: String) {
-        if (text == _toDoItemEntryUIStateMutableStateFlow.value.toDoItemUIModel.text) {
-            return
-        }
-        val toDoItemUIModel = _toDoItemEntryUIStateMutableStateFlow.value.toDoItemUIModel
-        val updatedToDoItemUIModel = toDoItemUIModel.copy(
-            text = text
-        )
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.ToDoItemUIModelUpdated(updatedToDoItemUIModel)
-        }
-    }
+            ToDoItemEntryUIAction.DeadLineSwitchStateChanged -> {
+                onDeadLineSwitchPressed()
+            }
 
-    fun onSpinnerItemSelectedListener(priorityStringId: Int) {
-        if (_toDoItemEntryUIStateMutableStateFlow.value.toDoItemUIModel.priorityValue == priorityStringId) {
-            return
+            ToDoItemEntryUIAction.SaveButtonPressed -> {
+                onSavePressed()
+            }
+
+            is ToDoItemEntryUIAction.SelectedDateChanged -> {
+                val date = toDoItemEntryUIAction.deadLineDate
+                val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(deadLineDateMillis = date)
+                uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
+            }
+
+            is ToDoItemEntryUIAction.TextChanged -> {
+                textChanged(toDoItemEntryUIAction.text)
+            }
+
+            is ToDoItemEntryUIAction.PrioritySelected -> {
+                val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(
+                    priorityStringId = toDoItemEntryUIAction.priorityStringId
+                )
+                uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
+            }
+
+            ToDoItemEntryUIAction.DeleteButtonPressed -> {
+                deleteToDoItem()
+            }
         }
-        val toDoItemUIModel = _toDoItemEntryUIStateMutableStateFlow.value.toDoItemUIModel
-        val updatedToDoItemUIModel = toDoItemUIModel.copy(
-            priorityValue = priorityStringId
-        )
-        _toDoItemEntryUIStateMutableStateFlow.update {
-            ToDoItemEntryUIState.ToDoItemUIModelUpdated(updatedToDoItemUIModel)
-        }
-    }
-
-    override fun onCleared() {
-        Log.d("TAGs", "onCleared: ")
-        super.onCleared()
-    }
-
-    fun onClosePressed(){
-
     }
 }

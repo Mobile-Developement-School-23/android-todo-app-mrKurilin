@@ -8,7 +8,8 @@
     <string name="priority">Приоритет</string>
     <string name="delete">Удалить</string>
     <string name="low">Низкий</string>
-    <string name="high"><font fgcolor='#FF0000'>!! Высокий</font></string>
+    <string name="basic">Обычный</string>
+    <string name="high_importance"><font fgcolor='#FF0000'>!! Высокий</font></string>
     <string name="no">Нет</string>
     <string name="information">Информация</string>
     <string name="close">Закрыть</string>
@@ -31,10 +32,11 @@
     <string name="cant_sync_without_auth">Невозможно синхронизировать список дел с сервером т.к. вы не авторизованы. Работа в автономном режиме.</string>
     <string name="data_synchronized">Список дел синхронизирован с сервером</string>
     <string name="synchronization_error">Ошибка синхронизации</string>
+    <string name="delete_to_do_item">Удалить задачу</string>
 
     <string-array name="priorities">
         <item>@string/low</item>
         <item>@string/no</item>
-        <item>@string/high</item>
+        <item>@string/high_importance</item>
     </string-array>
 </resources>
