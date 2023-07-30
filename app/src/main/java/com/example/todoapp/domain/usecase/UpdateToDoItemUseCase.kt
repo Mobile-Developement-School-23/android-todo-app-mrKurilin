@@ -13,13 +13,13 @@ class UpdateToDoItemUseCase @Inject constructor(
     suspend fun update(
         toDoItemId: String,
         text: String,
-        deadLineDate: Long?,
+        deadLineDateMillis: Long?,
         importance: ToDoItemImportance
     ) = withContext(Dispatchers.IO) {
         todoItemsRepository.updateToDoItem(
             toDoItemId = toDoItemId,
             text = text,
-            deadLineDate = deadLineDate,
+            deadLineDateMillis = deadLineDateMillis,
             priority = importance,
         )
     }

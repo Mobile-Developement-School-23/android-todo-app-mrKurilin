@@ -29,16 +29,16 @@ class ToDoItemUIMapper @Inject constructor() {
             id = todoItem.id,
             text = todoItem.text,
             priorityStringId = priorityStringId,
-            deadLineDate = todoItem.deadLineDate?.time
+            deadLineDateMillis = todoItem.deadLineDate?.time
         )
     }
 
     fun map(toDoItemUIModel: ToDoItemUIModel): ToDoItem {
         val creationDate = Date()
-        val deadLineDate = if (toDoItemUIModel.deadLineDate == null) {
+        val deadLineDate = if (toDoItemUIModel.deadLineDateMillis == null) {
             null
         } else {
-            Date(toDoItemUIModel.deadLineDate)
+            Date(toDoItemUIModel.deadLineDateMillis)
         }
 
         val priority = when (toDoItemUIModel.priorityStringId) {

@@ -10,11 +10,6 @@ import androidx.core.content.ContextCompat
 import com.example.todoapp.R
 import com.example.todoapp.ToDoApp
 import com.example.todoapp.presentation.MainActivity
-import java.util.Calendar
-import java.util.Calendar.HOUR_OF_DAY
-import java.util.Calendar.MILLISECOND
-import java.util.Calendar.MINUTE
-import java.util.Calendar.SECOND
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -41,16 +36,7 @@ fun NotificationManager.sendReminderNotification(
     val applicationContext = context.applicationContext
     val toDoApp = applicationContext as ToDoApp
     val toDoItemsRepository = toDoApp.provideAppComponent().toDoItemsRepository()
-
-    val today = Calendar.getInstance().also {
-        it.set(HOUR_OF_DAY, 0)
-        it.set(MINUTE, 0)
-        it.set(SECOND, 0)
-        it.set(MILLISECOND, 0)
-    }.timeInMillis
-
-    val deadLineToDoItems = toDoItemsRepository.getCurrentDeadLineToDoItems(today)
-
+    val deadLineToDoItems = toDoItemsRepository.getCurrentDeadLineToDoItems()
     val contentIntent = Intent(applicationContext, MainActivity::class.java)
     val pendingIntent = PendingIntent.getActivity(
         applicationContext,
@@ -66,7 +52,6 @@ fun NotificationManager.sendReminderNotification(
             .setSmallIcon(R.drawable.delete)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-
         notify(toDoItem.id.hashCode(), builder.build())
     }
 }

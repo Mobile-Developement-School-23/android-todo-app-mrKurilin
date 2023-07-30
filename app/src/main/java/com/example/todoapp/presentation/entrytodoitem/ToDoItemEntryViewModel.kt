@@ -47,11 +47,10 @@ class ToDoItemEntryViewModel @Inject constructor(
             updateToDoItemUseCase.update(
                 toDoItemId = toDoItemUIModel.id,
                 text = toDoItemUIModel.text,
-                deadLineDate = toDoItemUIModel.deadLineDate,
-                importance = ToDoItemImportance.fromValue(toDoItemUIModel.priorityStringId),
+                deadLineDateMillis = toDoItemUIModel.deadLineDateMillis,
+                importance = ToDoItemImportance.fromStringId(toDoItemUIModel.priorityStringId),
             )
         }
-
         _canBeClosed.value = true
     }
 
@@ -75,27 +74,18 @@ class ToDoItemEntryViewModel @Inject constructor(
     }
 
     private fun onDeadLineSwitchPressed() {
-        val deadLineDate = if (uiState.toDoItemUIModel.deadLineDate == null) {
+        val deadLineDate = if (uiState.toDoItemUIModel.deadLineDateMillis == null) {
             Date().time
         } else {
             null
         }
-        val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(deadLineDate = deadLineDate)
+        val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(deadLineDateMillis = deadLineDate)
         uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
     }
 
     private fun textChanged(text: String) {
         if (text != uiState.toDoItemUIModel.text) {
             val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(text = text)
-            uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
-        }
-    }
-
-    fun onSpinnerItemSelected(priorityStringId: Int) {
-        if (uiState.toDoItemUIModel.priorityStringId != priorityStringId) {
-            val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(
-                priorityStringId = priorityStringId
-            )
             uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
         }
     }
@@ -116,7 +106,7 @@ class ToDoItemEntryViewModel @Inject constructor(
 
             is ToDoItemEntryUIAction.SelectedDateChanged -> {
                 val date = toDoItemEntryUIAction.deadLineDate
-                val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(deadLineDate = date)
+                val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(deadLineDateMillis = date)
                 uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
             }
 
@@ -125,8 +115,9 @@ class ToDoItemEntryViewModel @Inject constructor(
             }
 
             is ToDoItemEntryUIAction.PrioritySelected -> {
-                val updatedToDoItemUIModel =
-                    uiState.toDoItemUIModel.copy(priorityStringId = toDoItemEntryUIAction.priorityStringId)
+                val updatedToDoItemUIModel = uiState.toDoItemUIModel.copy(
+                    priorityStringId = toDoItemEntryUIAction.priorityStringId
+                )
                 uiState = uiState.copy(toDoItemUIModel = updatedToDoItemUIModel)
             }
 

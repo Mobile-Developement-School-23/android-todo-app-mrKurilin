@@ -14,16 +14,16 @@ data class ToDoItemUIModel(
     val text: String = "",
     @StringRes
     val priorityStringId: Int = R.string.basic,
-    val deadLineDate: Long? = null,
+    val deadLineDateMillis: Long? = null,
 ) {
 
     val deadLineDateString: String
-        get(): String = if (deadLineDate == null) {
+        get(): String = if (deadLineDateMillis == null) {
             ""
         } else {
             SimpleDateFormat(
                 "dd MMMM yyyy",
                 Locale.getDefault()
-            ).format(Date(deadLineDate))
+            ).format(Date(deadLineDateMillis))
         }
 }

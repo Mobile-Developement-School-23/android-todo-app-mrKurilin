@@ -22,6 +22,7 @@ import com.example.todoapp.R
 @Composable
 fun ToDoItemEntryToolBar(
     onToDoItemEntryUIAction: (ToDoItemEntryUIAction) -> Unit = {},
+    isSaveButtonEnabled: Boolean = true,
 ) {
     Row(
         content = {
@@ -42,7 +43,8 @@ fun ToDoItemEntryToolBar(
                     .align(Alignment.Top),
                 content = {
                     Text(text = stringResource(id = R.string.save))
-                }
+                },
+                enabled = isSaveButtonEnabled,
             )
         },
         horizontalArrangement = Arrangement.SpaceBetween,

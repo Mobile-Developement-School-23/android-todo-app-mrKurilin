@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.todoapp.data.local.model.ToDoItemLocal
-import com.example.todoapp.data.local.model.ToDoItemLocal.Companion.DEADLINE_DATE_MILLIS_COLUMN_NAME
+import com.example.todoapp.data.local.model.ToDoItemLocal.Companion.DEADLINE_EPOCH_DAY_COLUMN_NAME
 import com.example.todoapp.data.local.model.ToDoItemLocal.Companion.ID_COLUMN_NAME
 import com.example.todoapp.data.local.model.ToDoItemLocal.Companion.TABLE_NAME
 import com.example.todoapp.data.local.model.ToDoItemLocal.Companion.TO_DO_ITEM_ACTION_COLUMN_NAME
@@ -47,6 +47,6 @@ interface ToDoItemLocalDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $ID_COLUMN_NAME = :toDoItemId")
     suspend fun getToDoItemLocalById(toDoItemId: String): ToDoItemLocal
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE $DEADLINE_DATE_MILLIS_COLUMN_NAME = :today")
-    fun getCurrentDeadLineToDoItems(today: Long): List<ToDoItemLocal>
+    @Query("SELECT * FROM $TABLE_NAME WHERE $DEADLINE_EPOCH_DAY_COLUMN_NAME = :epochDay")
+    fun getCurrentDeadLineToDoItems(epochDay: Long): List<ToDoItemLocal>
 }

@@ -17,11 +17,10 @@ class ReminderManager @Inject constructor(
 ) {
 
     fun startReminder(
-        reminderTime: String = "13:56",
+        reminderTime: String = "07:59",
         reminderId: Int = REMINDER_NOTIFICATION_REQUEST_CODE
     ) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
         val (hours, min) = reminderTime.split(":").map { it.toInt() }
         val intent = Intent(
             context.applicationContext,
@@ -46,10 +45,14 @@ class ReminderManager @Inject constructor(
             calendar.add(Calendar.DATE, 1)
         }
 
-        alarmManager.setAlarmClock(
-            AlarmManager.AlarmClockInfo(calendar.timeInMillis, intent),
-            intent
-        )
+        try {
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(calendar.timeInMillis, intent),
+                intent
+            )
+        } catch (security: SecurityException) {
+            error("Alarm set permission denied")
+        }
     }
 
     fun stopReminder(

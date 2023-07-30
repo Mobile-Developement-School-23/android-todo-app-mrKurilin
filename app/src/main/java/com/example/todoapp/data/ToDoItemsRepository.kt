@@ -64,13 +64,18 @@ class ToDoItemsRepository @Inject constructor(
     suspend fun updateToDoItem(
         toDoItemId: String,
         text: String,
-        deadLineDate: Long?,
+        deadLineDateMillis: Long?,
         priority: ToDoItemImportance
     ) {
         val toDoItemLocal = toDoItemsLocalDataSource.getToDoItemLocal(toDoItemId)
+        val deadLineEpochDay = if (deadLineDateMillis == null) {
+            null
+        } else {
+            deadLineDateMillis / DAY_MILLIS + 1
+        }
         val updatedToDoItemLocal = toDoItemLocal.copy(
             text = text,
-            deadLineDateMillis = deadLineDate,
+            deadLineEpochDay = deadLineEpochDay,
             importance = priority.value,
             toDoItemLocalRemoteAction = ToDoItemLocalRemoteAction.UPDATE,
             editDateMillis = Date().time
@@ -148,8 +153,8 @@ class ToDoItemsRepository @Inject constructor(
         sharedPreferences.edit().putInt(LAST_KNOWN_REVISION_KEY, revision).apply()
     }
 
-    fun getCurrentDeadLineToDoItems(today: Long): List<ToDoItem> {
-        return toDoItemsLocalDataSource.getCurrentDeadLineToDoItems(today).map {
+    fun getCurrentDeadLineToDoItems(): List<ToDoItem> {
+        return toDoItemsLocalDataSource.getCurrentDeadLineToDoItems().map {
             toDoItemLocalMapper.map(it)
         }
     }

@@ -37,7 +37,10 @@ fun ToDoItemEntryScreen(
 
     BottomSheetScaffold(
         topBar = {
-            ToDoItemEntryToolBar(onToDoItemEntryUIAction)
+            ToDoItemEntryToolBar(
+                onToDoItemEntryUIAction = onToDoItemEntryUIAction,
+                isSaveButtonEnabled = toDoItemEntryUIState.toDoItemUIModel.text.isNotBlank()
+            )
         },
         scaffoldState = scaffoldState,
         sheetContent = {
@@ -75,14 +78,15 @@ fun ToDoItemEntryScreen(
                 )
 
                 AnimatedVisibilityCalendarView(
-                    currentDate = toDoItemEntryUIState.toDoItemUIModel.deadLineDate,
+                    currentDate = toDoItemEntryUIState.toDoItemUIModel.deadLineDateMillis,
                     onToDoItemEntryUIAction = onToDoItemEntryUIAction,
                 )
 
                 Divider(modifier = Modifier.fillMaxWidth())
 
                 DeleteTextBlock(
-                    isEnabled = toDoItemEntryUIState.toDoItemUIModel.id != null
+                    isEnabled = toDoItemEntryUIState.toDoItemUIModel.id != null,
+                    onToDoItemEntryUIAction = onToDoItemEntryUIAction,
                 )
             }
         }
