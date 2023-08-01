@@ -5,7 +5,7 @@ plugins {
 gradlePlugin {
     plugins.register("upload-tg-plugin") {
         id = "upload-tg-plugin"
-        implementationClass = "com.example.shmr.UploadPlugin"
+        implementationClass = "com.example.shmr.plugins.upload.UploadPlugin"
     }
 }
 
